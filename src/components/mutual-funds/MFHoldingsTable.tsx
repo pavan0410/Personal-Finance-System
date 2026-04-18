@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, RefreshCw, TrendingUp, TrendingDown, IndianRupee } from 'lucide-react'
+import { Plus, RefreshCw, TrendingUp, TrendingDown, IndianRupee, Trash2 } from 'lucide-react'
 import { formatINR, formatAUD, formatPercent, gainLossColor } from '@/lib/utils'
 import { AddMFDialog } from './AddMFDialog'
+import { createClient } from '@/lib/supabase/client'
 import type { MutualFundHolding } from '@/types'
 import { useRouter } from 'next/navigation'
 
@@ -15,6 +16,16 @@ interface Props {
 export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
   const router = useRouter()
   const [showAdd, setShowAdd] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  async function handleDelete(id: string) {
+    if (!confirm('Remove this holding?')) return
+    setDeletingId(id)
+    const supabase = createClient()
+    await supabase.from('mutual_fund_holdings').delete().eq('id', id)
+    setDeletingId(null)
+    router.refresh()
+  }
 
   const totalValueINR = holdings.reduce((s, h) => s + h.units * (h.current_nav ?? 0), 0)
   const totalCostINR = holdings.reduce((s, h) => s + (h.cost_basis_inr ?? 0), 0)
@@ -111,9 +122,9 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ borderBottom: '1px solid hsl(var(--border))' }}>
-                  {['Scheme', 'Units', 'Avg NAV', 'Current NAV', 'Value (INR)', 'Value (AUD)', 'Gain/Loss'].map((h, i) => (
-                    <th key={h}
-                      className={`py-3 text-[10px] font-semibold uppercase tracking-widest ${i === 0 ? 'text-left px-6' : i === 6 ? 'text-right px-6' : 'text-right px-4'}`}
+                  {['Scheme', 'Units', 'Avg NAV', 'Current NAV', 'Value (INR)', 'Value (AUD)', 'Gain/Loss', ''].map((h, i) => (
+                    <th key={`${h}-${i}`}
+                      className={`py-3 text-[10px] font-semibold uppercase tracking-widest ${i === 0 ? 'text-left px-6' : i === 7 ? 'px-4' : 'text-right px-4'}`}
                       style={{ color: 'hsl(var(--muted-foreground))' }}>
                       {h}
                     </th>
@@ -130,7 +141,7 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
                   const isPositive = gainINR >= 0
 
                   return (
-                    <tr key={h.id} className="group transition-colors"
+                    <tr key={h.id} className="group transition-colors relative"
                       style={{ borderBottom: '1px solid hsl(var(--border))' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted) / 0.4)' }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
@@ -165,6 +176,15 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
                             <p className={`text-[11px] ${gainLossColor(gainPct)}`}>{formatPercent(gainPct)}</p>
                           </div>
                         </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <button onClick={() => handleDelete(h.id)} disabled={deletingId === h.id}
+                          className="h-7 w-7 rounded-lg flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
+                          style={{ color: 'hsl(var(--muted-foreground))' }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)'; (e.currentTarget as HTMLElement).style.color = '#ef4444' }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ''; (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground))' }}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </td>
                     </tr>
                   )

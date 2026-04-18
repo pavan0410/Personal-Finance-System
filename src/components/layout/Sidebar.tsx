@@ -114,8 +114,8 @@ export function Sidebar() {
         )}
       </nav>
 
-      {/* Footer */}
-      <div className="px-5 py-4" style={{ borderTop: '1px solid hsl(var(--sidebar-border))' }}>
+      {/* Footer — extra bottom padding avoids Next.js dev overlay overlap */}
+      <div className="px-5 pt-4 pb-10" style={{ borderTop: '1px solid hsl(var(--sidebar-border))' }}>
         <div className="flex items-center gap-2">
           <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
           <p className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>

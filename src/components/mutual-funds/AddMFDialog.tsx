@@ -24,6 +24,8 @@ export function AddMFDialog({ onClose }: Props) {
   const [selected, setSelected] = useState<MFAPIResult | null>(null)
   const [units, setUnits] = useState('')
   const [avgNav, setAvgNav] = useState('')
+  const [currentNav, setCurrentNav] = useState<{ nav: number; date: string } | null>(null)
+  const [fetchingNav, setFetchingNav] = useState(false)
   const [category, setCategory] = useState('')
   const [sipActive, setSipActive] = useState(false)
   const [sipAmount, setSipAmount] = useState('')
@@ -47,9 +49,17 @@ export function AddMFDialog({ onClose }: Props) {
     return () => clearTimeout(timer)
   }, [query])
 
-  function selectFund(r: MFAPIResult) {
+  async function selectFund(r: MFAPIResult) {
     setSelected(r)
     setStep('details')
+    setCurrentNav(null)
+    setFetchingNav(true)
+    try {
+      const navData = await fetchCurrentNAV(r.schemeCode)
+      setCurrentNav(navData)
+    } finally {
+      setFetchingNav(false)
+    }
   }
 
   async function fetchCurrentNAV(schemeCode: number) {
@@ -66,7 +76,7 @@ export function AddMFDialog({ onClose }: Props) {
     setSaving(true); setError('')
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    const navData = await fetchCurrentNAV(selected.schemeCode)
+    const navData = currentNav ?? await fetchCurrentNAV(selected.schemeCode)
     const unitsNum = parseFloat(units)
     const avgNavNum = parseFloat(avgNav) || 0
     const { error } = await supabase.from('mutual_fund_holdings').insert({
@@ -194,9 +204,21 @@ export function AddMFDialog({ onClose }: Props) {
                 style={{ background: 'hsl(var(--accent))', border: '1px solid hsl(var(--accent-foreground) / 0.15)' }}>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold truncate" style={{ color: 'hsl(var(--accent-foreground))' }}>{selected?.schemeName}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>NAV will be fetched automatically</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {fetchingNav ? (
+                      <span className="flex items-center gap-1 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                        <Loader2 className="h-3 w-3 animate-spin" /> Fetching NAV...
+                      </span>
+                    ) : currentNav ? (
+                      <span className="text-xs font-semibold" style={{ color: 'hsl(158 64% 40%)' }}>
+                        Current NAV: ₹{currentNav.nav.toFixed(4)} <span style={{ color: 'hsl(var(--muted-foreground))', fontWeight: 400 }}>as of {currentNav.date}</span>
+                      </span>
+                    ) : (
+                      <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>NAV unavailable — will retry on save</span>
+                    )}
+                  </div>
                 </div>
-                <button onClick={() => { setSelected(null); setStep('search') }}
+                <button onClick={() => { setSelected(null); setStep('search'); setCurrentNav(null) }}
                   className="ml-2 shrink-0 h-6 w-6 rounded-full flex items-center justify-center"
                   style={{ background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' }}>
                   <X className="h-3 w-3" />
