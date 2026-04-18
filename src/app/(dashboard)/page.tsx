@@ -52,44 +52,50 @@ export default async function DashboardPage() {
         </div>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           <StatCard
             label="Savings & Accounts"
             value={summary.accountsAUD}
-            icon={<CreditCard className="h-4 w-4 text-indigo-600" />}
-            color="bg-indigo-50 dark:bg-indigo-900/30"
+            icon={<CreditCard className="h-4 w-4 text-white" />}
+            gradient="linear-gradient(135deg, #6366f1, #8b5cf6)"
+            shadowColor="rgba(99,102,241,0.35)"
           />
           <StatCard
-            label="Mutual Funds"
+            label="Mutual Funds 🇮🇳"
             value={summary.mutualFundsAUD}
-            subLabel="INR value"
+            subLabel="INR"
             subValue={formatINR(totalMFValueINR)}
-            icon={<TrendingUp className="h-4 w-4 text-emerald-600" />}
-            color="bg-emerald-50 dark:bg-emerald-900/30"
+            icon={<TrendingUp className="h-4 w-4 text-white" />}
+            gradient="linear-gradient(135deg, #10b981, #059669)"
+            shadowColor="rgba(16,185,129,0.35)"
           />
           <StatCard
-            label="ETFs"
+            label="ETFs 🇦🇺 🇺🇸"
             value={summary.etfsAUD}
-            icon={<TrendingUp className="h-4 w-4 text-amber-600" />}
-            color="bg-amber-50 dark:bg-amber-900/30"
+            icon={<TrendingUp className="h-4 w-4 text-white" />}
+            gradient="linear-gradient(135deg, #f59e0b, #d97706)"
+            shadowColor="rgba(245,158,11,0.35)"
           />
           <StatCard
             label="Superannuation"
             value={summary.superAUD}
-            icon={<Landmark className="h-4 w-4 text-blue-600" />}
-            color="bg-blue-50 dark:bg-blue-900/30"
+            icon={<Landmark className="h-4 w-4 text-white" />}
+            gradient="linear-gradient(135deg, #3b82f6, #2563eb)"
+            shadowColor="rgba(59,130,246,0.35)"
           />
           <StatCard
-            label="Real Estate (equity)"
+            label="Real Estate"
             value={summary.realEstateAUD}
-            icon={<Home className="h-4 w-4 text-purple-600" />}
-            color="bg-purple-50 dark:bg-purple-900/30"
+            icon={<Home className="h-4 w-4 text-white" />}
+            gradient="linear-gradient(135deg, #8b5cf6, #7c3aed)"
+            shadowColor="rgba(139,92,246,0.35)"
           />
           <StatCard
             label="Liabilities"
-            value={-summary.liabilitiesAUD}
-            icon={<CreditCard className="h-4 w-4 text-red-600" />}
-            color="bg-red-50 dark:bg-red-900/30"
+            value={summary.liabilitiesAUD}
+            icon={<CreditCard className="h-4 w-4 text-white" />}
+            gradient="linear-gradient(135deg, #ef4444, #dc2626)"
+            shadowColor="rgba(239,68,68,0.35)"
           />
         </div>
 

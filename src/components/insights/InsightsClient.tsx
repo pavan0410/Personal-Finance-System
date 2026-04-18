@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles, Send, Loader2, RefreshCw } from 'lucide-react'
+import { Sparkles, Send, Loader2, RefreshCw, MessageSquare } from 'lucide-react'
 
 const PRESET_QUESTIONS = [
   'Give me a complete portfolio health check — diversification, concentration risks, and what to fix.',
@@ -62,56 +62,62 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Hero */}
-      <div className="rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-200 dark:border-indigo-800 p-6">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-            <Sparkles className="h-5 w-5 text-primary-foreground" />
+      {/* Hero banner */}
+      <div className="rounded-2xl p-6 relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, hsl(246 83% 50%) 0%, hsl(265 83% 55%) 50%, hsl(280 70% 50%) 100%)',
+          boxShadow: '0 20px 60px hsl(246 83% 50% / 0.3)',
+        }}>
+        <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-10" style={{ background: 'white' }} />
+        <div className="absolute -right-2 -bottom-6 h-20 w-20 rounded-full opacity-10" style={{ background: 'white' }} />
+        <div className="relative flex items-start gap-4">
+          <div className="h-12 w-12 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
+            <Sparkles className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="font-semibold">WealthLens AI</h2>
-            <p className="text-xs text-muted-foreground">Powered by Claude · Indian & Australian markets specialist</p>
+            <h2 className="font-bold text-lg text-white">WealthLens AI</h2>
+            <p className="text-sm text-white/70 mt-0.5">Powered by Claude · Indian & Australian markets specialist</p>
+            <p className="text-sm text-white/80 mt-3 leading-relaxed max-w-2xl">
+              Ask me anything about your portfolio — fund recommendations, goal analysis, tax optimisation for DTAA, or a complete financial health check. I analyse your real portfolio data to give specific, actionable advice.
+            </p>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground mt-3">
-          Ask me anything about your portfolio — fund recommendations, goal analysis, tax optimisation,
-          or a complete financial health check. I analyse your real portfolio data to give specific, actionable advice.
-        </p>
       </div>
 
-      {/* Quick questions */}
+      {/* Preset questions */}
       <div>
-        <p className="text-sm font-medium text-muted-foreground mb-3">Quick questions</p>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'hsl(var(--muted-foreground))' }}>Quick Questions</p>
         <div className="flex flex-wrap gap-2">
           {PRESET_QUESTIONS.map((q) => (
-            <button
-              key={q}
-              onClick={() => askQuestion(q)}
-              disabled={loading}
-              className="text-xs px-3 py-1.5 rounded-full border border-border hover:bg-muted hover:border-primary/50 transition-colors disabled:opacity-50 text-left"
-            >
-              {q.length > 60 ? q.slice(0, 58) + '…' : q}
+            <button key={q} onClick={() => askQuestion(q)} disabled={loading}
+              className="text-xs px-3 py-2 rounded-xl text-left transition-all disabled:opacity-50"
+              style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--foreground))' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(246 83% 60% / 0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'hsl(246 83% 60% / 0.4)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ''; (e.currentTarget as HTMLElement).style.borderColor = 'hsl(var(--border))' }}>
+              {q.length > 65 ? q.slice(0, 63) + '…' : q}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Input */}
-      <div className="rounded-xl border border-border bg-card p-4">
-        <div className="flex gap-3">
-          <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); askQuestion(question) } }}
-            placeholder="Ask about your portfolio, investment strategy, goals..."
-            rows={3}
-            className="flex-1 bg-transparent text-sm resize-none focus:outline-none placeholder:text-muted-foreground"
-          />
-          <button
-            onClick={() => askQuestion(question)}
-            disabled={loading || !question.trim()}
-            className="self-end px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2 text-sm"
-          >
+      {/* Input area */}
+      <div className="rounded-2xl p-4" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
+        <div className="flex gap-3 items-end">
+          <div className="flex-1">
+            <textarea
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); askQuestion(question) } }}
+              placeholder="Ask about your portfolio, investment strategy, goals... (Enter to send)"
+              rows={3}
+              className="w-full bg-transparent text-sm resize-none focus:outline-none"
+              style={{ color: 'hsl(var(--foreground))' }}
+            />
+          </div>
+          <button onClick={() => askQuestion(question)} disabled={loading || !question.trim()}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50 flex items-center gap-2 transition-all hover:opacity-90 shrink-0"
+            style={{ background: 'linear-gradient(135deg, hsl(246 83% 60%), hsl(280 83% 60%))', boxShadow: '0 4px 12px rgba(99,102,241,0.35)' }}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             Ask
           </button>
@@ -120,22 +126,41 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
 
       {/* Streaming response */}
       {(loading || response) && (
-        <div className="rounded-xl border border-border bg-card p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">AI Analysis</span>
-            {loading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground ml-auto" />}
+        <div className="rounded-2xl p-6" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
+          <div className="flex items-center gap-2 mb-5" style={{ borderBottom: '1px solid hsl(var(--border))', paddingBottom: '1rem' }}>
+            <div className="h-7 w-7 rounded-lg flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, hsl(246 83% 60%), hsl(280 83% 60%))' }}>
+              <Sparkles className="h-3.5 w-3.5 text-white" />
+            </div>
+            <span className="text-sm font-semibold">AI Analysis</span>
+            {loading && (
+              <div className="ml-auto flex items-center gap-1.5 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                <Loader2 className="h-3 w-3 animate-spin" /> Thinking...
+              </div>
+            )}
           </div>
-          <div className="prose prose-sm dark:prose-invert max-w-none">
+          <div className="space-y-2 text-sm leading-relaxed">
             {response.split('\n').map((line, i) => {
-              if (line.startsWith('## ')) return <h3 key={i} className="font-bold text-base mt-4 mb-2">{line.slice(3)}</h3>
-              if (line.startsWith('### ')) return <h4 key={i} className="font-semibold text-sm mt-3 mb-1">{line.slice(4)}</h4>
-              if (line.startsWith('- ') || line.startsWith('* ')) return <li key={i} className="ml-4 text-sm">{line.slice(2)}</li>
-              if (line.startsWith('**') && line.endsWith('**')) return <p key={i} className="font-bold text-sm">{line.slice(2, -2)}</p>
-              if (line.trim() === '') return <br key={i} />
-              return <p key={i} className="text-sm leading-relaxed">{line}</p>
+              if (line.startsWith('## ')) return (
+                <h3 key={i} className="font-bold text-base mt-5 mb-2" style={{ color: 'hsl(246 83% 65%)' }}>{line.slice(3)}</h3>
+              )
+              if (line.startsWith('### ')) return (
+                <h4 key={i} className="font-semibold text-sm mt-3 mb-1">{line.slice(4)}</h4>
+              )
+              if (line.startsWith('- ') || line.startsWith('* ')) return (
+                <div key={i} className="flex items-start gap-2 ml-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: 'hsl(246 83% 60%)' }} />
+                  <p>{line.slice(2)}</p>
+                </div>
+              )
+              if (line.startsWith('**') && line.endsWith('**')) return (
+                <p key={i} className="font-bold">{line.slice(2, -2)}</p>
+              )
+              if (line.trim() === '') return <div key={i} className="h-2" />
+              return <p key={i}>{line}</p>
             })}
-            {loading && <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-0.5 rounded" />}
+            {loading && <span className="inline-block w-1 h-4 rounded animate-pulse ml-0.5"
+              style={{ background: 'hsl(246 83% 60%)' }} />}
           </div>
         </div>
       )}
@@ -143,20 +168,25 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
       {/* History */}
       {history.length > 1 && (
         <div>
-          <p className="text-sm font-medium text-muted-foreground mb-3">Previous questions</p>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'hsl(var(--muted-foreground))' }}>Previous Questions</p>
           <div className="space-y-3">
             {history.slice(1).map((item, i) => (
-              <div key={i} className="rounded-xl border border-border bg-card p-4">
+              <div key={i} className="rounded-xl p-4 transition-colors"
+                style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <p className="text-sm font-medium text-primary">{item.q}</p>
-                  <button
-                    onClick={() => { setResponse(item.a); setQuestion('') }}
-                    className="text-muted-foreground hover:text-foreground shrink-0"
-                  >
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="h-3.5 w-3.5 shrink-0" style={{ color: 'hsl(246 83% 65%)' }} />
+                    <p className="text-sm font-medium">{item.q}</p>
+                  </div>
+                  <button onClick={() => { setResponse(item.a); setQuestion('') }}
+                    className="shrink-0 p-1 rounded-lg transition-colors"
+                    style={{ color: 'hsl(var(--muted-foreground))' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                     <RefreshCw className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <p className="text-xs text-muted-foreground line-clamp-2">{item.a.slice(0, 200)}…</p>
+                <p className="text-xs line-clamp-2" style={{ color: 'hsl(var(--muted-foreground))' }}>{item.a.slice(0, 200)}…</p>
               </div>
             ))}
           </div>
