@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, CreditCard, X, Loader2, Wallet, Building2 } from 'lucide-react'
+import { Plus, CreditCard, X, Loader2, Wallet, Building2, Link2, RefreshCw } from 'lucide-react'
 import { formatAUD } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -32,6 +32,42 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
   const [form, setForm] = useState({ name: '', type: 'savings' as Account['type'], institution: '', currency: 'AUD', balance: '', country: 'AU' })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [connecting, setConnecting] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+  const [syncMsg, setSyncMsg] = useState('')
+
+  async function handleConnectBank() {
+    setConnecting(true)
+    try {
+      const res = await fetch('/api/basiq/connect')
+      const data = await res.json()
+      if (data.url) {
+        window.open(data.url, '_blank', 'noopener,noreferrer')
+        setSyncMsg('Complete bank consent in the new tab, then click Sync.')
+      } else {
+        setSyncMsg(data.error ?? 'Failed to get connect URL')
+      }
+    } finally {
+      setConnecting(false)
+    }
+  }
+
+  async function handleSync() {
+    setSyncing(true)
+    setSyncMsg('')
+    try {
+      const res = await fetch('/api/basiq/sync', { method: 'POST' })
+      const data = await res.json()
+      if (data.success) {
+        setSyncMsg(`Synced ${data.synced} account${data.synced !== 1 ? 's' : ''} from your bank.`)
+        router.refresh()
+      } else {
+        setSyncMsg(data.error ?? 'Sync failed')
+      }
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   function update(k: string, v: string) { setForm(f => ({ ...f, [k]: v })) }
 
@@ -79,19 +115,42 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
 
       {/* Accounts list */}
       <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
-        <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+        <div className="px-6 py-4 flex items-center justify-between gap-3 flex-wrap" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
           <div>
             <h3 className="font-semibold">All Accounts</h3>
             {accounts.length > 0 && (
               <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{accounts.length} account{accounts.length !== 1 ? 's' : ''}</p>
             )}
           </div>
-          <button onClick={() => setShowAdd(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white transition-all hover:opacity-90"
-            style={{ background: 'linear-gradient(135deg, hsl(246 83% 60%), hsl(280 83% 60%))', boxShadow: '0 4px 12px rgba(99,102,241,0.35)' }}>
-            <Plus className="h-3 w-3" /> Add Account
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button onClick={handleConnectBank} disabled={connecting}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
+              style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
+              {connecting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3" />}
+              Connect 🇦🇺 Bank
+            </button>
+            <button onClick={handleSync} disabled={syncing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
+              style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
+              {syncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+              Sync
+            </button>
+            <button onClick={() => setShowAdd(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white transition-all hover:opacity-90"
+              style={{ background: 'linear-gradient(135deg, hsl(246 83% 60%), hsl(280 83% 60%))', boxShadow: '0 4px 12px rgba(99,102,241,0.35)' }}>
+              <Plus className="h-3 w-3" /> Add Account
+            </button>
+          </div>
         </div>
+        {syncMsg && (
+          <div className="px-6 py-3 text-xs" style={{ borderBottom: '1px solid hsl(var(--border))', background: 'hsl(var(--muted) / 0.5)', color: 'hsl(var(--muted-foreground))' }}>
+            {syncMsg}
+          </div>
+        )}
 
         {accounts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -119,9 +178,17 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{a.name}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                    {a.institution ? `${a.institution} · ` : ''}<span className="capitalize">{a.type}</span> · {a.country === 'AU' ? '🇦🇺' : a.country === 'IN' ? '🇮🇳' : '🌐'} {a.country}
-                  </p>
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                      {a.institution ? `${a.institution} · ` : ''}<span className="capitalize">{a.type}</span> · {a.country === 'AU' ? '🇦🇺' : a.country === 'IN' ? '🇮🇳' : '🌐'} {a.country}
+                    </span>
+                    {a.basiq_account_id && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
+                        style={{ background: 'rgba(16,185,129,0.12)', color: '#10b981' }}>
+                        Live
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-right shrink-0">
                   <p className={`font-bold text-lg ${a.type === 'credit' ? 'text-red-500' : ''}`}>
