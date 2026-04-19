@@ -67,7 +67,11 @@ export function AddMFDialog({ onClose }: Props) {
       const res = await fetch(`https://api.mfapi.in/mf/${schemeCode}`)
       const data = await res.json()
       const latest = data.data?.[0]
-      return latest ? { nav: parseFloat(latest.nav), date: latest.date } : null
+      if (!latest) return null
+      // MFAPI returns DD-MM-YYYY; convert to YYYY-MM-DD for Postgres
+      const [dd, mm, yyyy] = (latest.date as string).split('-')
+      const isoDate = `${yyyy}-${mm}-${dd}`
+      return { nav: parseFloat(latest.nav), date: isoDate }
     } catch { return null }
   }
 
