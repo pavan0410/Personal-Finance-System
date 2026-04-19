@@ -99,7 +99,7 @@ export async function getConsentUrl(token: string, basiqUserId: string, mobile: 
   return url
 }
 
-export async function fetchBasiqAccounts(token: string, basiqUserId: string): Promise<BasiqAccount[]> {
+export async function fetchBasiqAccounts(token: string, basiqUserId: string): Promise<{ accounts: BasiqAccount[]; raw: unknown }> {
   const res = await fetch(`${BASIQ_API}/users/${basiqUserId}/accounts`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -107,8 +107,9 @@ export async function fetchBasiqAccounts(token: string, basiqUserId: string): Pr
     },
   })
   const data = await res.json()
-  if (!res.ok) throw new Error(data.detail ?? data.title ?? 'Failed to fetch accounts')
-  return (data.data ?? []).filter((a: BasiqAccount) => a.status === 'available')
+  if (!res.ok) throw basiqError(data, 'Failed to fetch accounts')
+  // Return all accounts regardless of status so we can debug
+  return { accounts: data.data ?? [], raw: data }
 }
 
 export function mapBasiqAccount(a: BasiqAccount, userId: string) {
