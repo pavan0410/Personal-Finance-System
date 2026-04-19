@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Landmark, Shield, Loader2, X, TrendingUp } from 'lucide-react'
+import { Plus, Landmark, Shield, Loader2, X, TrendingUp, RefreshCw } from 'lucide-react'
 import { formatAUD } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -23,6 +23,35 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
   const [tpdCover, setTpdCover] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [updating, setUpdating] = useState<Superannuation | null>(null)
+  const [updBalance, setUpdBalance] = useState('')
+  const [updEmp, setUpdEmp] = useState('')
+  const [updPersonal, setUpdPersonal] = useState('')
+  const [updDate, setUpdDate] = useState(new Date().toISOString().split('T')[0])
+  const [updSaving, setUpdSaving] = useState(false)
+
+  function openUpdate(a: Superannuation) {
+    setUpdating(a)
+    setUpdBalance(String(a.balance ?? ''))
+    setUpdEmp(String(a.employer_contributions_ytd ?? ''))
+    setUpdPersonal(String(a.personal_contributions_ytd ?? ''))
+    setUpdDate(new Date().toISOString().split('T')[0])
+  }
+
+  async function handleUpdate() {
+    if (!updating) return
+    setUpdSaving(true)
+    const supabase = createClient()
+    const { error } = await supabase.from('superannuation').update({
+      balance: parseFloat(updBalance) || 0,
+      employer_contributions_ytd: parseFloat(updEmp) || 0,
+      personal_contributions_ytd: parseFloat(updPersonal) || 0,
+      balance_date: updDate,
+      updated_at: new Date().toISOString(),
+    }).eq('id', updating.id)
+    setUpdSaving(false)
+    if (!error) { setUpdating(null); router.refresh() }
+  }
 
   const totalBalance = accounts.reduce((s, a) => s + (a.balance ?? 0), 0)
   const totalEmployer = accounts.reduce((s, a) => s + a.employer_contributions_ytd, 0)
@@ -139,6 +168,13 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
                       {a.balance_date && <span>As at {a.balance_date}</span>}
                     </div>
                   </div>
+                  <button onClick={() => openUpdate(a)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors shrink-0"
+                    style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
+                    <RefreshCw className="h-3 w-3" /> Update Balance
+                  </button>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div className="rounded-xl p-3" style={{ background: 'hsl(var(--muted) / 0.5)' }}>
@@ -168,6 +204,69 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
           </div>
         )}
       </div>
+
+      {updating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>
+          <div className="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
+            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+            <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+              <div>
+                <h2 className="font-bold text-lg">Update Balance</h2>
+                <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{updating.fund_name}</p>
+              </div>
+              <button onClick={() => setUpdating(null)}
+                className="h-8 w-8 rounded-lg flex items-center justify-center"
+                style={{ color: 'hsl(var(--muted-foreground))' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>New Balance (AUD)</label>
+                  <input type="number" value={updBalance} onChange={e => setUpdBalance(e.target.value)}
+                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>As At Date</label>
+                  <input type="date" value={updDate} onChange={e => setUpdDate(e.target.value)}
+                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Employer YTD</label>
+                  <input type="number" value={updEmp} onChange={e => setUpdEmp(e.target.value)}
+                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Personal YTD</label>
+                  <input type="number" value={updPersonal} onChange={e => setUpdPersonal(e.target.value)}
+                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 flex justify-end gap-3" style={{ borderTop: '1px solid hsl(var(--border))' }}>
+              <button onClick={() => setUpdating(null)}
+                className="px-4 py-2 text-sm rounded-lg"
+                style={{ border: '1px solid hsl(var(--border))' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
+                Cancel
+              </button>
+              <button onClick={handleUpdate} disabled={updSaving || !updBalance}
+                className="px-5 py-2 text-sm rounded-lg text-white font-medium disabled:opacity-50 flex items-center gap-2 hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg, #3b82f6, #2563eb)' }}>
+                {updSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                Save Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
