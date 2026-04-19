@@ -40,6 +40,15 @@ export interface BasiqAccount {
   status: string
 }
 
+function basiqError(data: unknown, fallback: string): Error {
+  if (typeof data === 'object' && data !== null) {
+    const d = data as Record<string, unknown>
+    const msg = d.detail ?? d.title ?? d.message ?? d.error
+    if (msg) return new Error(`${fallback}: ${msg}`)
+  }
+  return new Error(`${fallback}: ${JSON.stringify(data)}`)
+}
+
 export async function getBasiqToken(): Promise<string> {
   const res = await fetch(`${BASIQ_API}/token`, {
     method: 'POST',
@@ -51,7 +60,7 @@ export async function getBasiqToken(): Promise<string> {
     body: 'scope=SERVER_ACCESS',
   })
   const data = await res.json()
-  if (!res.ok) throw new Error(data.detail ?? data.title ?? 'Basiq auth failed')
+  if (!res.ok) throw basiqError(data, 'Basiq auth failed')
   return data.access_token
 }
 
@@ -66,7 +75,7 @@ export async function createBasiqUser(token: string, email: string): Promise<str
     body: JSON.stringify({ email }),
   })
   const data = await res.json()
-  if (!res.ok) throw new Error(data.detail ?? data.title ?? 'Basiq user creation failed')
+  if (!res.ok) throw basiqError(data, 'Basiq user creation failed')
   return data.id
 }
 
@@ -81,8 +90,13 @@ export async function getConsentUrl(token: string, basiqUserId: string): Promise
     body: JSON.stringify({}),
   })
   const data = await res.json()
-  if (!res.ok) throw new Error(data.detail ?? data.title ?? 'Failed to get consent URL')
-  return data.links.public
+  if (!res.ok) throw basiqError(data, 'Failed to get consent URL')
+  // v3 returns links.public; older SDK returns data
+  const url = (data as Record<string, unknown>)?.links
+    ? (data as { links: { public: string } }).links.public
+    : (data as { data: { links: { public: string } } }).data?.links?.public
+  if (!url) throw new Error(`Unexpected auth_link response: ${JSON.stringify(data)}`)
+  return url
 }
 
 export async function fetchBasiqAccounts(token: string, basiqUserId: string): Promise<BasiqAccount[]> {
