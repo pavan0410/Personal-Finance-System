@@ -35,11 +35,16 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
   const [connecting, setConnecting] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
+  const [showMobilePrompt, setShowMobilePrompt] = useState(false)
+  const [mobile, setMobile] = useState('+61')
 
   async function handleConnectBank() {
+    const normalised = mobile.trim()
+    if (!normalised || normalised === '+61') return
+    setShowMobilePrompt(false)
     setConnecting(true)
     try {
-      const res = await fetch('/api/basiq/connect')
+      const res = await fetch(`/api/basiq/connect?mobile=${encodeURIComponent(normalised)}`)
       const data = await res.json()
       if (data.url) {
         window.open(data.url, '_blank', 'noopener,noreferrer')
@@ -123,7 +128,7 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={handleConnectBank} disabled={connecting}
+            <button onClick={() => setShowMobilePrompt(true)} disabled={connecting}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
               style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
@@ -203,6 +208,55 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
       </div>
 
       {/* Add dialog */}
+      {showMobilePrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>
+          <div className="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
+            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+            <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+              <div>
+                <h2 className="font-bold text-lg">Connect Australian Bank</h2>
+                <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>Basiq will send an SMS to verify your identity</p>
+              </div>
+              <button onClick={() => setShowMobilePrompt(false)}
+                className="h-8 w-8 rounded-lg flex items-center justify-center"
+                style={{ color: 'hsl(var(--muted-foreground))' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="p-6">
+              <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                Australian Mobile Number
+              </label>
+              <input
+                value={mobile}
+                onChange={e => setMobile(e.target.value)}
+                placeholder="+61412345678"
+                className={inputCls}
+                style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }}
+              />
+              <p className="text-xs mt-2" style={{ color: 'hsl(var(--muted-foreground))' }}>Format: +61 followed by your number (e.g. +61412345678)</p>
+            </div>
+            <div className="px-6 py-4 flex justify-end gap-3" style={{ borderTop: '1px solid hsl(var(--border))' }}>
+              <button onClick={() => setShowMobilePrompt(false)}
+                className="px-4 py-2 text-sm rounded-lg"
+                style={{ border: '1px solid hsl(var(--border))' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
+                Cancel
+              </button>
+              <button onClick={handleConnectBank} disabled={!mobile || mobile === '+61'}
+                className="px-5 py-2 text-sm rounded-lg text-white font-medium disabled:opacity-50 flex items-center gap-2 hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg, hsl(246 83% 60%), hsl(280 83% 60%))' }}>
+                <Link2 className="h-4 w-4" /> Connect Bank
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>

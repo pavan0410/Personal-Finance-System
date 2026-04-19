@@ -3,7 +3,10 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { getBasiqToken, createBasiqUser, getConsentUrl } from '@/lib/basiq'
 
-export async function GET() {
+export async function GET(req: Request) {
+  const mobile = new URL(req.url).searchParams.get('mobile')
+  if (!mobile) return NextResponse.json({ error: 'mobile query param required' }, { status: 400 })
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -41,7 +44,7 @@ export async function GET() {
     }
 
     step = 'consent-url'
-    const consentUrl = await getConsentUrl(token, basiqUserId)
+    const consentUrl = await getConsentUrl(token, basiqUserId, mobile)
     return NextResponse.json({ url: consentUrl })
   } catch (err) {
     return NextResponse.json({ error: String(err), step }, { status: 500 })

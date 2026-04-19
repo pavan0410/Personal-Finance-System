@@ -79,7 +79,7 @@ export async function createBasiqUser(token: string, email: string): Promise<str
   return data.id
 }
 
-export async function getConsentUrl(token: string, basiqUserId: string): Promise<string> {
+export async function getConsentUrl(token: string, basiqUserId: string, mobile: string): Promise<string> {
   const res = await fetch(`${BASIQ_API}/users/${basiqUserId}/auth_link`, {
     method: 'POST',
     headers: {
@@ -87,7 +87,7 @@ export async function getConsentUrl(token: string, basiqUserId: string): Promise
       'Content-Type': 'application/json',
       'basiq-version': '3.0',
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify({ mobile }),
   })
   const data = await res.json()
   if (!res.ok) throw basiqError(data, 'Failed to get consent URL')
