@@ -23,7 +23,7 @@ export function AddMFDialog({ onClose }: Props) {
   const [searching, setSearching] = useState(false)
   const [selected, setSelected] = useState<MFAPIResult | null>(null)
   const [units, setUnits] = useState('')
-  const [avgNav, setAvgNav] = useState('')
+  const [totalInvested, setTotalInvested] = useState('')
   const [currentNav, setCurrentNav] = useState<{ nav: number; date: string } | null>(null)
   const [fetchingNav, setFetchingNav] = useState(false)
   const [category, setCategory] = useState('')
@@ -82,7 +82,8 @@ export function AddMFDialog({ onClose }: Props) {
     const { data: { user } } = await supabase.auth.getUser()
     const navData = currentNav ?? await fetchCurrentNAV(selected.schemeCode)
     const unitsNum = parseFloat(units)
-    const avgNavNum = parseFloat(avgNav) || 0
+    const investedNum = parseFloat(totalInvested) || 0
+    const avgNavNum = unitsNum > 0 && investedNum > 0 ? investedNum / unitsNum : (navData?.nav ?? 0)
     const { error } = await supabase.from('mutual_fund_holdings').insert({
       user_id: user!.id,
       scheme_code: selected.schemeCode.toString(),
@@ -92,8 +93,8 @@ export function AddMFDialog({ onClose }: Props) {
       avg_purchase_nav: avgNavNum || null,
       current_nav: navData?.nav ?? null,
       nav_date: navData?.date ?? null,
-      cost_basis_inr: unitsNum * avgNavNum,
-      current_value_inr: navData ? unitsNum * navData.nav : unitsNum * avgNavNum,
+      cost_basis_inr: investedNum || unitsNum * avgNavNum,
+      current_value_inr: navData ? unitsNum * navData.nav : investedNum,
       sip_active: sipActive,
       sip_amount: sipActive && sipAmount ? parseFloat(sipAmount) : null,
     })
@@ -235,27 +236,32 @@ export function AddMFDialog({ onClose }: Props) {
                     Units Held *
                   </label>
                   <input type="number" step="0.0001" value={units} onChange={e => setUnits(e.target.value)}
-                    placeholder="e.g. 1234.5678" className={inputCls} style={inputStyle}
+                    placeholder="e.g. 3913.45" className={inputCls} style={inputStyle}
                     onFocus={e => (e.target as HTMLElement).style.borderColor = 'hsl(var(--primary))'}
                     onBlur={e => (e.target as HTMLElement).style.borderColor = 'hsl(var(--border))'} />
                 </div>
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                    Avg NAV (₹)
+                    Total Invested (₹)
                   </label>
-                  <input type="number" step="0.01" value={avgNav} onChange={e => setAvgNav(e.target.value)}
-                    placeholder="e.g. 125.50" className={inputCls} style={inputStyle}
+                  <input type="number" step="1" value={totalInvested} onChange={e => setTotalInvested(e.target.value)}
+                    placeholder="e.g. 608000" className={inputCls} style={inputStyle}
                     onFocus={e => (e.target as HTMLElement).style.borderColor = 'hsl(var(--primary))'}
                     onBlur={e => (e.target as HTMLElement).style.borderColor = 'hsl(var(--border))'} />
                 </div>
               </div>
 
-              {units && avgNav && (
+              {units && totalInvested && parseFloat(units) > 0 && (
                 <div className="px-3.5 py-3 rounded-xl text-sm"
                   style={{ background: 'hsl(158 64% 40% / 0.1)', border: '1px solid hsl(158 64% 40% / 0.2)' }}>
+                  <span style={{ color: 'hsl(var(--muted-foreground))' }}>Avg NAV: </span>
+                  <span className="font-semibold" style={{ color: 'hsl(158 64% 40%)' }}>
+                    ₹{(parseFloat(totalInvested) / parseFloat(units)).toFixed(4)}
+                  </span>
+                  <span className="mx-2" style={{ color: 'hsl(var(--muted-foreground))' }}>·</span>
                   <span style={{ color: 'hsl(var(--muted-foreground))' }}>Invested: </span>
                   <span className="font-semibold" style={{ color: 'hsl(158 64% 40%)' }}>
-                    ₹{(parseFloat(units) * parseFloat(avgNav)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    ₹{parseFloat(totalInvested).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
               )}
