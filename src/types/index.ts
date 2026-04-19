@@ -19,6 +19,8 @@ export interface Account {
   is_active: boolean
   basiq_account_id: string | null
   basiq_connection_id: string | null
+  saltedge_account_id: string | null
+  saltedge_connection_id: string | null
   created_at: string
   updated_at: string
 }

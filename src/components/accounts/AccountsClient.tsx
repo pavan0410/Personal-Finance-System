@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, CreditCard, X, Loader2, Wallet, Building2, Link2, RefreshCw } from 'lucide-react'
 import { formatAUD } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { Account } from '@/types'
 
 const INSTITUTIONS_AU = ['Commonwealth Bank', 'ANZ', 'Westpac', 'NAB', 'Macquarie', 'ING', 'Bendigo', 'Other']
@@ -28,6 +28,7 @@ const inputCls = 'w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:r
 
 export function AccountsClient({ accounts, userId }: { accounts: Account[]; userId: string }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [showAdd, setShowAdd] = useState(false)
   const [form, setForm] = useState({ name: '', type: 'savings' as Account['type'], institution: '', currency: 'AUD', balance: '', country: 'AU' })
   const [saving, setSaving] = useState(false)
@@ -35,24 +36,27 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
   const [connecting, setConnecting] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
-  const [showMobilePrompt, setShowMobilePrompt] = useState(false)
-  const [mobile, setMobile] = useState('+61')
+
+  useEffect(() => {
+    const synced = searchParams.get('synced')
+    const error = searchParams.get('error')
+    if (synced) setSyncMsg(`Successfully synced ${synced} account${synced === '1' ? '' : 's'} from your bank.`)
+    if (error) setSyncMsg(`Sync error: ${error.replace(/_/g, ' ')}`)
+  }, [searchParams])
 
   async function handleConnectBank() {
-    const normalised = mobile.trim()
-    if (!normalised || normalised === '+61') return
-    setShowMobilePrompt(false)
     setConnecting(true)
     try {
-      const res = await fetch(`/api/basiq/connect?mobile=${encodeURIComponent(normalised)}`)
+      const res = await fetch('/api/saltedge/connect')
       const data = await res.json()
       if (data.url) {
-        window.open(data.url, '_blank', 'noopener,noreferrer')
-        setSyncMsg('Complete bank consent in the new tab, then click Sync.')
+        window.location.href = data.url
       } else {
         setSyncMsg(data.error ?? 'Failed to get connect URL')
+        setConnecting(false)
       }
-    } finally {
+    } catch {
+      setSyncMsg('Failed to connect to bank')
       setConnecting(false)
     }
   }
@@ -61,7 +65,7 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
     setSyncing(true)
     setSyncMsg('')
     try {
-      const res = await fetch('/api/basiq/sync', { method: 'POST' })
+      const res = await fetch('/api/saltedge/sync', { method: 'POST' })
       const data = await res.json()
       if (data.success) {
         setSyncMsg(`Synced ${data.synced} account${data.synced !== 1 ? 's' : ''} from your bank.`)
@@ -128,7 +132,7 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => setShowMobilePrompt(true)} disabled={connecting}
+            <button onClick={handleConnectBank} disabled={connecting}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
               style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
@@ -187,7 +191,7 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
                     <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
                       {a.institution ? `${a.institution} · ` : ''}<span className="capitalize">{a.type}</span> · {a.country === 'AU' ? '🇦🇺' : a.country === 'IN' ? '🇮🇳' : '🌐'} {a.country}
                     </span>
-                    {a.basiq_account_id && (
+                    {(a.basiq_account_id || a.saltedge_account_id) && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
                         style={{ background: 'rgba(16,185,129,0.12)', color: '#10b981' }}>
                         Live
@@ -208,55 +212,6 @@ export function AccountsClient({ accounts, userId }: { accounts: Account[]; user
       </div>
 
       {/* Add dialog */}
-      {showMobilePrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>
-          <div className="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
-            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
-            <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
-              <div>
-                <h2 className="font-bold text-lg">Connect Australian Bank</h2>
-                <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>Basiq will send an SMS to verify your identity</p>
-              </div>
-              <button onClick={() => setShowMobilePrompt(false)}
-                className="h-8 w-8 rounded-lg flex items-center justify-center"
-                style={{ color: 'hsl(var(--muted-foreground))' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="p-6">
-              <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                Australian Mobile Number
-              </label>
-              <input
-                value={mobile}
-                onChange={e => setMobile(e.target.value)}
-                placeholder="+61412345678"
-                className={inputCls}
-                style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }}
-              />
-              <p className="text-xs mt-2" style={{ color: 'hsl(var(--muted-foreground))' }}>Format: +61 followed by your number (e.g. +61412345678)</p>
-            </div>
-            <div className="px-6 py-4 flex justify-end gap-3" style={{ borderTop: '1px solid hsl(var(--border))' }}>
-              <button onClick={() => setShowMobilePrompt(false)}
-                className="px-4 py-2 text-sm rounded-lg"
-                style={{ border: '1px solid hsl(var(--border))' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
-                Cancel
-              </button>
-              <button onClick={handleConnectBank} disabled={!mobile || mobile === '+61'}
-                className="px-5 py-2 text-sm rounded-lg text-white font-medium disabled:opacity-50 flex items-center gap-2 hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, hsl(246 83% 60%), hsl(280 83% 60%))' }}>
-                <Link2 className="h-4 w-4" /> Connect Bank
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>
