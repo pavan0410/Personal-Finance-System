@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, RefreshCw, TrendingUp, TrendingDown, IndianRupee, Trash2 } from 'lucide-react'
+import { Plus, RefreshCw, TrendingUp, TrendingDown, IndianRupee, Trash2, Loader2 } from 'lucide-react'
 import { formatINR, formatAUD, formatPercent, gainLossColor } from '@/lib/utils'
 import { AddMFDialog } from './AddMFDialog'
 import { createClient } from '@/lib/supabase/client'
@@ -17,6 +17,17 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
   const router = useRouter()
   const [showAdd, setShowAdd] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+
+  async function handleRefreshNAV() {
+    setRefreshing(true)
+    try {
+      await fetch('/api/mf/refresh-nav', { method: 'POST' })
+      router.refresh()
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   async function handleDelete(id: string) {
     if (!confirm('Remove this holding?')) return
@@ -27,7 +38,7 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
     router.refresh()
   }
 
-  const totalValueINR = holdings.reduce((s, h) => s + h.units * (h.current_nav ?? 0), 0)
+  const totalValueINR = holdings.reduce((s, h) => s + (h.current_nav != null ? h.units * h.current_nav : (h.cost_basis_inr ?? 0)), 0)
   const totalCostINR = holdings.reduce((s, h) => s + (h.cost_basis_inr ?? 0), 0)
   const totalGainINR = totalValueINR - totalCostINR
   const totalGainPct = totalCostINR > 0 ? (totalGainINR / totalCostINR) * 100 : 0
@@ -88,12 +99,13 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => router.refresh()}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors"
+            <button onClick={handleRefreshNAV} disabled={refreshing}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
               style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
-              <RefreshCw className="h-3 w-3" /> Refresh NAV
+              {refreshing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+              Refresh NAV
             </button>
             <button onClick={() => setShowAdd(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white transition-all hover:opacity-90"
@@ -133,10 +145,11 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
               </thead>
               <tbody>
                 {holdings.map((h) => {
-                  const currentValueINR = h.units * (h.current_nav ?? 0)
+                  const hasNav = h.current_nav != null
+                  const currentValueINR = hasNav ? h.units * h.current_nav! : (h.cost_basis_inr ?? 0)
                   const costINR = h.cost_basis_inr ?? 0
-                  const gainINR = currentValueINR - costINR
-                  const gainPct = costINR > 0 ? (gainINR / costINR) * 100 : 0
+                  const gainINR = hasNav ? currentValueINR - costINR : 0
+                  const gainPct = hasNav && costINR > 0 ? (gainINR / costINR) * 100 : 0
                   const valueAUD = currentValueINR * inrAudRate
                   const isPositive = gainINR >= 0
 
