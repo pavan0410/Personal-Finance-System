@@ -1,5 +1,6 @@
 import { Header } from '@/components/layout/Header'
 import { MFHoldingsTable } from '@/components/mutual-funds/MFHoldingsTable'
+import { SIPHistory } from '@/components/mutual-funds/SIPHistory'
 import { createClient } from '@/lib/supabase/server'
 import { getExchangeRate } from '@/lib/currency'
 import { formatAUD, formatINR, formatPercent, gainLossColor } from '@/lib/utils'
@@ -14,6 +15,13 @@ export default async function MutualFundsPage() {
     .select('*')
     .eq('user_id', user!.id)
     .order('created_at', { ascending: false })
+
+  const { data: sipHistory = [] } = await supabase
+    .from('sip_history')
+    .select('*')
+    .eq('user_id', user!.id)
+    .order('created_at', { ascending: false })
+    .limit(30)
 
   const inrAudRate = await getExchangeRate('INR', 'AUD')
 
@@ -66,6 +74,23 @@ export default async function MutualFundsPage() {
             <h3 className="font-semibold">Holdings</h3>
           </div>
           <MFHoldingsTable holdings={holdings ?? []} inrAudRate={inrAudRate} />
+        </div>
+
+        {/* SIP Sync History */}
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold">Email Sync History</h3>
+              <p className="text-xs mt-0.5 text-muted-foreground">Auto-updates from INDmoney SIP emails</p>
+            </div>
+            {(sipHistory?.length ?? 0) > 0 && (
+              <span className="text-xs px-2 py-0.5 rounded-full"
+                style={{ background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' }}>
+                {sipHistory?.length} event{sipHistory?.length !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+          <SIPHistory events={sipHistory ?? []} />
         </div>
       </main>
     </>
