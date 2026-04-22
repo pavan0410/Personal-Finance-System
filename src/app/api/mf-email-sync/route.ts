@@ -23,8 +23,11 @@ function parseMoney(raw: string | null): number | null {
 function parseFundName(text: string): string | null {
   // Handle plain: "in Kotak Midcap Fund Direct Growth is successful"
   // Handle bold:  "in *Kotak Midcap Fund Direct Growth* is successful"
-  const m = text.match(/in \*?([A-Za-z][^*\n]{4,80}?)\*?\s+is successful/i)
-  return m ? m[1].trim() : null
+  // Handle bold across newline: "in *Kotak Midcap\nFund Direct Growth* is successful"
+  const m = text.match(/in \*?([A-Za-z][^*]{4,120}?)\*?\s+is successful/i)
+  if (!m) return null
+  // Collapse any internal whitespace/newlines (from line-wrapped bold text)
+  return m[1].replace(/\s+/g, ' ').trim()
 }
 
 interface ParsedUnitsEmail {
