@@ -21,7 +21,9 @@ function parseMoney(raw: string | null): number | null {
 }
 
 function parseFundName(text: string): string | null {
-  const m = text.match(/in ([A-Za-z][^.]+?) is successful/i)
+  // Handle plain: "in Kotak Midcap Fund Direct Growth is successful"
+  // Handle bold:  "in *Kotak Midcap Fund Direct Growth* is successful"
+  const m = text.match(/in \*?([A-Za-z][^*\n]{4,80}?)\*?\s+is successful/i)
   return m ? m[1].trim() : null
 }
 
@@ -46,9 +48,12 @@ function parseEmail(text: string): ParsedEmail | null {
   const amount  = parseMoney(field(text, 'SIP Amount received'))
 
   // Email type 1: Units Allocated
-  const unitsRaw  = field(text, 'Units allocated')
+  const unitsRaw  = field(text, 'Units allocated') ?? field(text, 'Units')
   const navRaw    = field(text, 'NAV')
+  // Date: try labelled field first, then "dated DD/MM/YYYY" in the sentence body
   const sipDate   = parseDate(field(text, 'SIP Date'))
+                 ?? parseDate(field(text, 'Installment Date'))
+                 ?? (() => { const m = text.match(/dated \*?(\d{2}\/\d{2}\/\d{4})\*?/i); return m ? parseDate(m[1]) : null })()
 
   if (unitsRaw && navRaw && sipDate) {
     const units = parseFloat(unitsRaw)
@@ -66,6 +71,15 @@ function parseEmail(text: string): ParsedEmail | null {
   ) {
     const date = parseDate(field(text, 'Installment Date'))
                ?? parseDate(field(text, 'SIP Date'))
+               ?? (() => { const m = text.match(/dated \*?(\d{2}\/\d{2}\/\d{4})\*?/i); return m ? parseDate(m[1]) : null })()
+               ?? new Date().toISOString().split('T')[0]
+    return { type: 'payment_confirmed', fundName, folio, orderId, date, amount }
+  }
+
+  // Email type 3: "SIP Installment Successful" with units in body (INDmoney combined email)
+  // Fund name parsed, folio found, amount found — treat as payment_confirmed if no units/NAV
+  if (fundName && (folio || amount)) {
+    const date = (() => { const m = text.match(/dated \*?(\d{2}\/\d{2}\/\d{4})\*?/i); return m ? parseDate(m[1]) : null })()
                ?? new Date().toISOString().split('T')[0]
     return { type: 'payment_confirmed', fundName, folio, orderId, date, amount }
   }
