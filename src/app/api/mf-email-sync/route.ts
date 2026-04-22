@@ -116,6 +116,24 @@ export async function POST(req: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 
+  // ── Idempotency check — skip if we've already processed this exact transaction ──
+  // Use order_id if present, otherwise fall back to (fund_name + sip_date + email_type)
+  {
+    const dupQuery = supabase
+      .from('sip_history')
+      .select('id')
+      .eq('user_id', body.userId)
+      .eq('email_type', parsed.type)
+    const { data: existing } = await (
+      parsed.orderId
+        ? dupQuery.eq('order_id', parsed.orderId)
+        : dupQuery.eq('fund_name', parsed.fundName).eq('sip_date', parsed.date)
+    ).maybeSingle()
+    if (existing) {
+      return NextResponse.json({ success: true, action: 'already_synced', fund: parsed.fundName })
+    }
+  }
+
   // Payment-only: just log, no holding update
   if (parsed.type === 'payment_confirmed') {
     await supabase.from('sip_history').insert({
