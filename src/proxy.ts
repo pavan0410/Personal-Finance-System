@@ -23,16 +23,25 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // Use getSession() — reads from cookie with no network call, safe for Edge Runtime.
+  // Individual pages call getUser() for proper server-side token verification.
+  let session = null
+  try {
+    const { data } = await supabase.auth.getSession()
+    session = data.session
+  } catch {
+    // If Supabase is unreachable, allow request through — page-level auth handles it.
+    return supabaseResponse
+  }
 
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/signup')
 
-  if (!user && !isAuthPage) {
+  if (!session && !isAuthPage) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user && isAuthPage) {
+  if (session && isAuthPage) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
