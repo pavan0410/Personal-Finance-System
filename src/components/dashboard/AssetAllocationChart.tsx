@@ -17,7 +17,8 @@ export function AssetAllocationChart({ summary }: { summary: PortfolioSummary })
 
   if (data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">
+      <div className="h-64 flex items-center justify-center text-sm"
+        style={{ color: 'rgba(161,174,255,0.4)' }}>
         No assets tracked yet
       </div>
     )
@@ -42,14 +43,17 @@ export function AssetAllocationChart({ summary }: { summary: PortfolioSummary })
         <Tooltip
           formatter={(value) => [formatAUD(typeof value === 'number' ? value : 0), '']}
           contentStyle={{
-            borderRadius: '8px',
-            border: '1px solid hsl(var(--border))',
-            background: 'hsl(var(--card))',
-            color: 'hsl(var(--foreground))',
+            borderRadius: '12px',
+            border: '1px solid rgba(99,102,241,0.25)',
+            background: 'rgba(10,12,30,0.97)',
+            color: 'rgba(220,225,255,0.9)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
           }}
         />
         <Legend
-          formatter={(value) => <span className="text-xs text-muted-foreground">{value}</span>}
+          formatter={(value) => (
+            <span style={{ fontSize: '12px', color: 'rgba(161,174,255,0.6)' }}>{value}</span>
+          )}
         />
       </PieChart>
     </ResponsiveContainer>

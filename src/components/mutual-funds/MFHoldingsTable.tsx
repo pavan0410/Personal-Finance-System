@@ -13,6 +13,15 @@ interface Props {
   inrAudRate: number
 }
 
+const CARD_STYLE = {
+  background: 'rgba(13,16,40,0.8)',
+  border: '1px solid rgba(99,102,241,0.15)',
+  backdropFilter: 'blur(12px)',
+}
+
+const LABEL_COLOR = { color: 'rgba(161,174,255,0.5)' }
+const TEXT_COLOR = { color: 'rgba(220,225,255,0.9)' }
+
 export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
   const router = useRouter()
   const [showAdd, setShowAdd] = useState(false)
@@ -70,18 +79,17 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
               shadow: totalGainINR >= 0 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)',
             },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl p-5 flex flex-col gap-3"
-              style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+            <div key={s.label} className="rounded-2xl p-5 flex flex-col gap-3" style={CARD_STYLE}>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'hsl(var(--muted-foreground))' }}>{s.label}</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider" style={LABEL_COLOR}>{s.label}</span>
                 <div className="h-8 w-8 rounded-lg flex items-center justify-center"
                   style={{ background: s.gradient, boxShadow: `0 4px 12px ${s.shadow}` }}>
                   <IndianRupee className="h-3.5 w-3.5 text-white" />
                 </div>
               </div>
               <div>
-                <p className="text-xl font-bold tracking-tight">{s.value}</p>
-                <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{s.sub}</p>
+                <p className="text-xl font-bold tracking-tight" style={TEXT_COLOR}>{s.value}</p>
+                <p className="text-xs mt-0.5" style={LABEL_COLOR}>{s.sub}</p>
               </div>
             </div>
           ))}
@@ -89,27 +97,24 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
       )}
 
       {/* Table card */}
-      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
+      <div className="rounded-2xl overflow-hidden" style={CARD_STYLE}>
         {/* Header bar */}
-        <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+        <div className="px-6 py-4 flex items-center justify-between"
+          style={{ borderBottom: '1px solid rgba(99,102,241,0.12)' }}>
           <div>
-            <h3 className="font-semibold">Holdings</h3>
+            <h3 className="font-semibold" style={TEXT_COLOR}>Holdings</h3>
             {holdings.length > 0 && (
-              <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{holdings.length} fund{holdings.length !== 1 ? 's' : ''}</p>
+              <p className="text-xs mt-0.5" style={LABEL_COLOR}>{holdings.length} fund{holdings.length !== 1 ? 's' : ''}</p>
             )}
           </div>
           <div className="flex items-center gap-2">
             <button onClick={handleRefreshNAV} disabled={refreshing}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50"
-              style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
+              className="btn-ghost flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs disabled:opacity-50">
               {refreshing ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
               Refresh NAV
             </button>
             <button onClick={() => setShowAdd(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white transition-all hover:opacity-90"
-              style={{ background: 'linear-gradient(135deg, hsl(246 83% 60%), hsl(280 83% 60%))', boxShadow: '0 4px 12px rgba(99,102,241,0.35)' }}>
+              className="btn-gradient flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white">
               <Plus className="h-3 w-3" /> Add Holding
             </button>
           </div>
@@ -121,11 +126,9 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
               style={{ background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 8px 24px rgba(16,185,129,0.3)' }}>
               <IndianRupee className="h-8 w-8 text-white" />
             </div>
-            <p className="font-semibold mb-1">No mutual funds yet</p>
-            <p className="text-sm mb-4" style={{ color: 'hsl(var(--muted-foreground))' }}>Start tracking your Indian mutual fund investments</p>
-            <button onClick={() => setShowAdd(true)}
-              className="px-4 py-2 rounded-lg text-sm text-white transition-all hover:opacity-90"
-              style={{ background: 'linear-gradient(135deg, hsl(246 83% 60%), hsl(280 83% 60%))' }}>
+            <p className="font-semibold mb-1" style={TEXT_COLOR}>No mutual funds yet</p>
+            <p className="text-sm mb-4" style={LABEL_COLOR}>Start tracking your Indian mutual fund investments</p>
+            <button onClick={() => setShowAdd(true)} className="btn-gradient px-4 py-2 rounded-lg text-sm text-white">
               Add your first holding →
             </button>
           </div>
@@ -133,11 +136,11 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+                <tr style={{ borderBottom: '1px solid rgba(99,102,241,0.12)' }}>
                   {['Scheme', 'Units', 'Avg NAV', 'Current NAV', 'Value (INR)', 'Value (AUD)', 'Gain/Loss', ''].map((h, i) => (
                     <th key={`${h}-${i}`}
                       className={`py-3 text-[10px] font-semibold uppercase tracking-widest ${i === 0 ? 'text-left px-6' : i === 7 ? 'px-4' : 'text-right px-4'}`}
-                      style={{ color: 'hsl(var(--muted-foreground))' }}>
+                      style={LABEL_COLOR}>
                       {h}
                     </th>
                   ))}
@@ -154,17 +157,17 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
                   const isPositive = gainINR >= 0
 
                   return (
-                    <tr key={h.id} className="group transition-colors relative"
-                      style={{ borderBottom: '1px solid hsl(var(--border))' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted) / 0.4)' }}
+                    <tr key={h.id} className="group transition-colors"
+                      style={{ borderBottom: '1px solid rgba(99,102,241,0.08)' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.05)' }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                       <td className="px-6 py-4">
-                        <p className="font-medium leading-tight max-w-[220px] truncate">{h.scheme_name}</p>
+                        <p className="font-medium leading-tight max-w-[220px] truncate" style={TEXT_COLOR}>{h.scheme_name}</p>
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          {h.fund_house && <span className="text-[11px]" style={{ color: 'hsl(var(--muted-foreground))' }}>{h.fund_house}</span>}
+                          {h.fund_house && <span className="text-[11px]" style={LABEL_COLOR}>{h.fund_house}</span>}
                           {h.category && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
-                              style={{ background: 'hsl(246 83% 60% / 0.12)', color: 'hsl(246 83% 65%)' }}>
+                              style={{ background: 'rgba(99,102,241,0.12)', color: '#818cf8' }}>
                               {h.category}
                             </span>
                           )}
@@ -176,11 +179,11 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
                           )}
                         </div>
                       </td>
-                      <td className="text-right px-4 py-4 font-mono text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>{h.units.toFixed(4)}</td>
-                      <td className="text-right px-4 py-4 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>₹{h.avg_purchase_nav?.toFixed(2) ?? '—'}</td>
-                      <td className="text-right px-4 py-4 font-semibold text-sm">₹{h.current_nav?.toFixed(2) ?? '—'}</td>
-                      <td className="text-right px-4 py-4 font-semibold">{formatINR(currentValueINR)}</td>
-                      <td className="text-right px-4 py-4 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>{formatAUD(valueAUD)}</td>
+                      <td className="text-right px-4 py-4 font-mono text-xs" style={LABEL_COLOR}>{h.units.toFixed(4)}</td>
+                      <td className="text-right px-4 py-4 text-xs" style={LABEL_COLOR}>₹{h.avg_purchase_nav?.toFixed(2) ?? '—'}</td>
+                      <td className="text-right px-4 py-4 font-semibold text-sm" style={TEXT_COLOR}>₹{h.current_nav?.toFixed(2) ?? '—'}</td>
+                      <td className="text-right px-4 py-4 font-semibold" style={TEXT_COLOR}>{formatINR(currentValueINR)}</td>
+                      <td className="text-right px-4 py-4 text-xs" style={LABEL_COLOR}>{formatAUD(valueAUD)}</td>
                       <td className="text-right px-6 py-4">
                         <div className="flex items-center justify-end gap-1">
                           {isPositive ? <TrendingUp className="h-3 w-3 text-emerald-500" /> : <TrendingDown className="h-3 w-3 text-red-500" />}
@@ -193,9 +196,9 @@ export function MFHoldingsTable({ holdings, inrAudRate }: Props) {
                       <td className="px-4 py-4">
                         <button onClick={() => handleDelete(h.id)} disabled={deletingId === h.id}
                           className="h-7 w-7 rounded-lg flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-50"
-                          style={{ color: 'hsl(var(--muted-foreground))' }}
+                          style={{ color: 'rgba(161,174,255,0.5)' }}
                           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)'; (e.currentTarget as HTMLElement).style.color = '#ef4444' }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ''; (e.currentTarget as HTMLElement).style.color = 'hsl(var(--muted-foreground))' }}>
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ''; (e.currentTarget as HTMLElement).style.color = 'rgba(161,174,255,0.5)' }}>
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </td>

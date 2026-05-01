@@ -85,9 +85,9 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
           { label: 'Personal YTD', value: formatAUD(totalPersonal), gradient: 'linear-gradient(135deg, #6366f1, #8b5cf6)', shadow: 'rgba(99,102,241,0.3)', icon: <TrendingUp className="h-4 w-4 text-white" /> },
         ].map((s) => (
           <div key={s.label} className="rounded-2xl p-5 flex flex-col gap-3"
-            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+            style={{ background: 'rgba(13,16,40,0.8)', border: '1px solid rgba(99,102,241,0.15)' }}>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'hsl(var(--muted-foreground))' }}>{s.label}</span>
+              <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(161,174,255,0.5)' }}>{s.label}</span>
               <div className="h-8 w-8 rounded-lg flex items-center justify-center"
                 style={{ background: s.gradient, boxShadow: `0 4px 12px ${s.shadow}` }}>
                 {s.icon}
@@ -100,17 +100,17 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
 
       {/* Contributions breakdown */}
       {accounts.length > 0 && (
-        <div className="rounded-2xl p-5" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+        <div className="rounded-2xl p-5" style={{ background: 'rgba(13,16,40,0.8)', border: '1px solid rgba(99,102,241,0.15)' }}>
           <p className="text-sm font-semibold mb-3">Contributions YTD Breakdown</p>
           <div className="flex gap-3 mb-2">
-            <div className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
-              Employer <span className="font-semibold" style={{ color: 'hsl(var(--foreground))' }}>{formatAUD(totalEmployer)}</span>
+            <div className="text-xs" style={{ color: 'rgba(161,174,255,0.5)' }}>
+              Employer <span className="font-semibold" style={{ color: 'rgba(220,225,255,0.9)' }}>{formatAUD(totalEmployer)}</span>
             </div>
-            <div className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
-              Personal <span className="font-semibold" style={{ color: 'hsl(var(--foreground))' }}>{formatAUD(totalPersonal)}</span>
+            <div className="text-xs" style={{ color: 'rgba(161,174,255,0.5)' }}>
+              Personal <span className="font-semibold" style={{ color: 'rgba(220,225,255,0.9)' }}>{formatAUD(totalPersonal)}</span>
             </div>
           </div>
-          <div className="h-3 rounded-full overflow-hidden flex" style={{ background: 'hsl(var(--muted))' }}>
+          <div className="h-3 rounded-full overflow-hidden flex" style={{ background: 'rgba(99,102,241,0.08)' }}>
             {totalContribs > 0 && (
               <>
                 <div className="h-full transition-all" style={{ width: `${(totalEmployer / totalContribs) * 100}%`, background: 'linear-gradient(90deg, #10b981, #059669)' }} />
@@ -122,11 +122,11 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
       )}
 
       {/* Funds list */}
-      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
-        <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(13,16,40,0.8)' }}>
+        <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(99,102,241,0.12)' }}>
           <div>
             <h3 className="font-semibold">Super Funds</h3>
-            {accounts.length > 0 && <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{accounts.length} fund{accounts.length !== 1 ? 's' : ''}</p>}
+            {accounts.length > 0 && <p className="text-xs mt-0.5" style={{ color: 'rgba(161,174,255,0.5)' }}>{accounts.length} fund{accounts.length !== 1 ? 's' : ''}</p>}
           </div>
           <button onClick={() => setShowAdd(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white transition-all hover:opacity-90"
@@ -142,7 +142,7 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
               <Landmark className="h-8 w-8 text-white" />
             </div>
             <p className="font-semibold mb-1">No super funds added</p>
-            <p className="text-sm mb-4" style={{ color: 'hsl(var(--muted-foreground))' }}>Track your superannuation balance and contributions</p>
+            <p className="text-sm mb-4" style={{ color: 'rgba(161,174,255,0.5)' }}>Track your superannuation balance and contributions</p>
             <button onClick={() => setShowAdd(true)}
               className="px-4 py-2 rounded-lg text-sm text-white"
               style={{ background: 'linear-gradient(135deg, #3b82f6, #2563eb)' }}>
@@ -162,7 +162,7 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
                   </div>
                   <div className="flex-1">
                     <p className="font-bold text-lg">{a.fund_name}</p>
-                    <div className="flex flex-wrap gap-3 mt-1 text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    <div className="flex flex-wrap gap-3 mt-1 text-xs" style={{ color: 'rgba(161,174,255,0.5)' }}>
                       {a.member_number && <span>Member: {a.member_number}</span>}
                       {a.investment_option && <span>Option: {a.investment_option}</span>}
                       {a.balance_date && <span>As at {a.balance_date}</span>}
@@ -170,15 +170,15 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
                   </div>
                   <button onClick={() => openUpdate(a)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors shrink-0"
-                    style={{ border: '1px solid hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
+                    style={{ border: '1px solid rgba(99,102,241,0.15)', color: 'hsl(var(--muted-foreground))' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                     <RefreshCw className="h-3 w-3" /> Update Balance
                   </button>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="rounded-xl p-3" style={{ background: 'hsl(var(--muted) / 0.5)' }}>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'hsl(var(--muted-foreground))' }}>Balance</p>
+                  <div className="rounded-xl p-3" style={{ background: 'rgba(13,16,40,0.5)' }}>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'rgba(161,174,255,0.5)' }}>Balance</p>
                     <p className="font-bold">{formatAUD(a.balance)}</p>
                   </div>
                   <div className="rounded-xl p-3" style={{ background: 'rgba(16,185,129,0.08)' }}>
@@ -209,15 +209,15 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>
           <div className="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden"
-            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
-            <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+            style={{ background: 'rgba(13,16,40,0.8)', border: '1px solid rgba(99,102,241,0.15)' }}>
+            <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(99,102,241,0.12)' }}>
               <div>
                 <h2 className="font-bold text-lg">Update Balance</h2>
-                <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{updating.fund_name}</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(161,174,255,0.5)' }}>{updating.fund_name}</p>
               </div>
               <button onClick={() => setUpdating(null)}
                 className="h-8 w-8 rounded-lg flex items-center justify-center"
-                style={{ color: 'hsl(var(--muted-foreground))' }}
+                style={{ color: 'rgba(161,174,255,0.5)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                 <X className="h-4 w-4" />
@@ -226,33 +226,33 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>New Balance (AUD)</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>New Balance (AUD)</label>
                   <input type="number" value={updBalance} onChange={e => setUpdBalance(e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>As At Date</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>As At Date</label>
                   <input type="date" value={updDate} onChange={e => setUpdDate(e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Employer YTD</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Employer YTD</label>
                   <input type="number" value={updEmp} onChange={e => setUpdEmp(e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Personal YTD</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Personal YTD</label>
                   <input type="number" value={updPersonal} onChange={e => setUpdPersonal(e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
             </div>
-            <div className="px-6 py-4 flex justify-end gap-3" style={{ borderTop: '1px solid hsl(var(--border))' }}>
+            <div className="px-6 py-4 flex justify-end gap-3" style={{ borderTop: '1px solid rgba(99,102,241,0.12)' }}>
               <button onClick={() => setUpdating(null)}
                 className="px-4 py-2 text-sm rounded-lg"
-                style={{ border: '1px solid hsl(var(--border))' }}
+                style={{ border: '1px solid rgba(99,102,241,0.15)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                 Cancel
@@ -272,16 +272,16 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>
           <div className="w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
-            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+            style={{ background: 'rgba(13,16,40,0.8)', border: '1px solid rgba(99,102,241,0.15)' }}>
             <div className="px-6 py-5 flex items-center justify-between sticky top-0 z-10"
-              style={{ borderBottom: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
+              style={{ borderBottom: '1px solid rgba(99,102,241,0.12)', background: 'rgba(13,16,40,0.8)' }}>
               <div>
                 <h2 className="font-bold text-lg">Add Super Fund</h2>
-                <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>Track your superannuation details</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(161,174,255,0.5)' }}>Track your superannuation details</p>
               </div>
               <button onClick={() => setShowAdd(false)}
                 className="h-8 w-8 rounded-lg flex items-center justify-center"
-                style={{ color: 'hsl(var(--muted-foreground))' }}
+                style={{ color: 'rgba(161,174,255,0.5)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                 <X className="h-4 w-4" />
@@ -289,62 +289,62 @@ export function SuperClient({ accounts, userId }: { accounts: Superannuation[]; 
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Fund Name *</label>
+                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Fund Name *</label>
                 <input value={fundName} onChange={(e) => setFundName(e.target.value)} placeholder="Australian Super, REST, Hostplus..."
-                  className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                  className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Balance (AUD) *</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Balance (AUD) *</label>
                   <input type="number" value={balance} onChange={(e) => setBalance(e.target.value)} placeholder="150000"
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Balance Date</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Balance Date</label>
                   <input type="date" value={balanceDate} onChange={(e) => setBalanceDate(e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Member Number</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Member Number</label>
                   <input value={memberNum} onChange={(e) => setMemberNum(e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Investment Option</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Investment Option</label>
                   <input value={investOption} onChange={(e) => setInvestOption(e.target.value)} placeholder="Balanced, Growth..."
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Employer Contrib YTD</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Employer Contrib YTD</label>
                   <input type="number" value={empContrib} onChange={(e) => setEmpContrib(e.target.value)} placeholder="0"
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Personal Contrib YTD</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Personal Contrib YTD</label>
                   <input type="number" value={personalContrib} onChange={(e) => setPersonalContrib(e.target.value)} placeholder="0"
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Insurance Coverage</label>
+                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Insurance Coverage</label>
                 <div className="grid grid-cols-2 gap-3">
                   <input type="number" value={deathCover} onChange={(e) => setDeathCover(e.target.value)} placeholder="Death cover"
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                   <input type="number" value={tpdCover} onChange={(e) => setTpdCover(e.target.value)} placeholder="TPD cover"
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
               {error && <p className="text-sm text-red-500 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
             </div>
             <div className="px-6 py-4 flex justify-end gap-3 sticky bottom-0"
-              style={{ borderTop: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
+              style={{ borderTop: '1px solid rgba(99,102,241,0.12)', background: 'rgba(13,16,40,0.8)' }}>
               <button onClick={() => setShowAdd(false)}
                 className="px-4 py-2 text-sm rounded-lg transition-colors"
-                style={{ border: '1px solid hsl(var(--border))' }}
+                style={{ border: '1px solid rgba(99,102,241,0.15)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                 Cancel

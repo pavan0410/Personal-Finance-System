@@ -23,21 +23,24 @@ function formatINR(n: number) {
 
 const ACTION_STYLES: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
   updated:    { bg: 'rgba(16,185,129,0.1)',  text: '#10b981', icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
-  created:    { bg: 'rgba(99,102,241,0.1)',  text: 'hsl(246 83% 65%)', icon: <Plus className="h-3.5 w-3.5" /> },
+  created:    { bg: 'rgba(99,102,241,0.1)',  text: '#818cf8', icon: <Plus className="h-3.5 w-3.5" /> },
   logged_only:{ bg: 'rgba(245,158,11,0.1)',  text: '#f59e0b', icon: <Clock className="h-3.5 w-3.5" /> },
   error:      { bg: 'rgba(239,68,68,0.1)',   text: '#ef4444', icon: <AlertCircle className="h-3.5 w-3.5" /> },
 }
+
+const LABEL_COLOR = { color: 'rgba(161,174,255,0.5)' }
+const TEXT_COLOR = { color: 'rgba(220,225,255,0.9)' }
 
 export function SIPHistory({ events }: { events: SIPEvent[] }) {
   if (events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <div className="h-12 w-12 rounded-xl flex items-center justify-center mb-3"
-          style={{ background: 'hsl(var(--muted))' }}>
-          <Clock className="h-6 w-6" style={{ color: 'hsl(var(--muted-foreground))' }} />
+          style={{ background: 'rgba(99,102,241,0.1)' }}>
+          <Clock className="h-6 w-6" style={{ color: 'rgba(161,174,255,0.5)' }} />
         </div>
-        <p className="font-medium text-sm">No sync history yet</p>
-        <p className="text-xs mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
+        <p className="font-medium text-sm" style={TEXT_COLOR}>No sync history yet</p>
+        <p className="text-xs mt-1" style={LABEL_COLOR}>
           Events will appear here once the Gmail automation detects SIP emails
         </p>
       </div>
@@ -45,7 +48,7 @@ export function SIPHistory({ events }: { events: SIPEvent[] }) {
   }
 
   return (
-    <div className="divide-y" style={{ borderColor: 'hsl(var(--border))' }}>
+    <div>
       {events.map((e) => {
         const style = ACTION_STYLES[e.action_taken ?? 'error'] ?? ACTION_STYLES.error
         const isUnits = e.email_type === 'units_allocated'
@@ -55,7 +58,8 @@ export function SIPHistory({ events }: { events: SIPEvent[] }) {
         }) : '—'
 
         return (
-          <div key={e.id} className="px-6 py-4 flex items-start gap-4">
+          <div key={e.id} className="px-6 py-4 flex items-start gap-4"
+            style={{ borderBottom: '1px solid rgba(99,102,241,0.08)' }}>
             {/* Icon */}
             <div className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
               style={{ background: style.bg, color: style.text }}>
@@ -65,7 +69,7 @@ export function SIPHistory({ events }: { events: SIPEvent[] }) {
             {/* Main content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <p className="font-semibold text-sm truncate">{e.fund_name}</p>
+                <p className="font-semibold text-sm truncate" style={TEXT_COLOR}>{e.fund_name}</p>
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0"
                   style={{ background: style.bg, color: style.text }}>
                   {e.action_taken === 'updated' ? 'Updated' :
@@ -73,46 +77,46 @@ export function SIPHistory({ events }: { events: SIPEvent[] }) {
                    e.action_taken === 'logged_only' ? 'Payment logged' : 'Error'}
                 </span>
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0"
-                  style={{ background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' }}>
+                  style={{ background: 'rgba(99,102,241,0.1)', color: 'rgba(161,174,255,0.7)' }}>
                   {isUnits ? '📩 Units allocated' : '💳 Payment confirmed'}
                 </span>
               </div>
 
               <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1.5">
                 {e.amount != null && (
-                  <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                    Amount: <span className="font-medium" style={{ color: 'hsl(var(--foreground))' }}>{formatINR(e.amount)}</span>
+                  <span className="text-xs" style={LABEL_COLOR}>
+                    Amount: <span className="font-medium" style={TEXT_COLOR}>{formatINR(e.amount)}</span>
                   </span>
                 )}
                 {e.units != null && (
-                  <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                    Units: <span className="font-medium" style={{ color: 'hsl(var(--foreground))' }}>+{e.units.toFixed(4)}</span>
+                  <span className="text-xs" style={LABEL_COLOR}>
+                    Units: <span className="font-medium" style={TEXT_COLOR}>+{e.units.toFixed(4)}</span>
                   </span>
                 )}
                 {e.nav != null && (
-                  <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                    NAV: <span className="font-medium" style={{ color: 'hsl(var(--foreground))' }}>₹{e.nav}</span>
+                  <span className="text-xs" style={LABEL_COLOR}>
+                    NAV: <span className="font-medium" style={TEXT_COLOR}>₹{e.nav}</span>
                   </span>
                 )}
                 {e.folio_number && (
-                  <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                  <span className="text-xs" style={LABEL_COLOR}>
                     Folio: {e.folio_number}
                   </span>
                 )}
                 {e.sip_date && (
-                  <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                  <span className="text-xs" style={LABEL_COLOR}>
                     SIP Date: {e.sip_date}
                   </span>
                 )}
               </div>
 
               {e.notes && (
-                <p className="text-xs mt-1 italic" style={{ color: 'hsl(var(--muted-foreground))' }}>{e.notes}</p>
+                <p className="text-xs mt-1 italic" style={LABEL_COLOR}>{e.notes}</p>
               )}
             </div>
 
             {/* Timestamp */}
-            <p className="text-xs shrink-0" style={{ color: 'hsl(var(--muted-foreground))' }}>{date}</p>
+            <p className="text-xs shrink-0" style={LABEL_COLOR}>{date}</p>
           </div>
         )
       })}

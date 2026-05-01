@@ -62,9 +62,9 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
           { label: 'Total Loan', value: formatAUD(totalLoan), gradient: 'linear-gradient(135deg, #ef4444, #dc2626)', shadow: 'rgba(239,68,68,0.3)', icon: <DollarSign className="h-4 w-4 text-white" /> },
         ].map((s) => (
           <div key={s.label} className="rounded-2xl p-5 flex flex-col gap-3"
-            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+            style={{ background: 'rgba(13,16,40,0.8)', border: '1px solid rgba(99,102,241,0.15)' }}>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'hsl(var(--muted-foreground))' }}>{s.label}</span>
+              <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'rgba(161,174,255,0.5)' }}>{s.label}</span>
               <div className="h-8 w-8 rounded-lg flex items-center justify-center"
                 style={{ background: s.gradient, boxShadow: `0 4px 12px ${s.shadow}` }}>
                 {s.icon}
@@ -76,11 +76,11 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
       </div>
 
       {/* Properties */}
-      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
-        <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(13,16,40,0.8)' }}>
+        <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(99,102,241,0.12)' }}>
           <div>
             <h3 className="font-semibold">Properties</h3>
-            {properties.length > 0 && <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{properties.length} propert{properties.length !== 1 ? 'ies' : 'y'}</p>}
+            {properties.length > 0 && <p className="text-xs mt-0.5" style={{ color: 'rgba(161,174,255,0.5)' }}>{properties.length} propert{properties.length !== 1 ? 'ies' : 'y'}</p>}
           </div>
           <button onClick={() => setShowAdd(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white transition-all hover:opacity-90"
@@ -96,7 +96,7 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
               <Home className="h-8 w-8 text-white" />
             </div>
             <p className="font-semibold mb-1">No properties added</p>
-            <p className="text-sm mb-4" style={{ color: 'hsl(var(--muted-foreground))' }}>Track your real estate portfolio in India and Australia</p>
+            <p className="text-sm mb-4" style={{ color: 'rgba(161,174,255,0.5)' }}>Track your real estate portfolio in India and Australia</p>
             <button onClick={() => setShowAdd(true)}
               className="px-4 py-2 rounded-lg text-sm text-white"
               style={{ background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' }}>
@@ -124,7 +124,7 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-bold text-lg">{p.name}</p>
                         <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
-                          style={{ background: 'hsl(var(--muted))', color: 'hsl(var(--foreground))' }}>
+                          style={{ background: 'rgba(99,102,241,0.08)', color: 'hsl(var(--foreground))' }}>
                           {p.country === 'AU' ? '🇦🇺' : p.country === 'IN' ? '🇮🇳' : '🌐'} {p.country}
                         </span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold capitalize"
@@ -132,7 +132,7 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
                           {TYPE_LABEL[p.property_type ?? 'residential']}
                         </span>
                       </div>
-                      {p.address && <p className="text-sm mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>{p.address}</p>}
+                      {p.address && <p className="text-sm mt-0.5" style={{ color: 'rgba(161,174,255,0.5)' }}>{p.address}</p>}
                     </div>
                     {gainFromPurchase !== null && gainPct !== null && (
                       <div className="text-right shrink-0">
@@ -142,14 +142,14 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
                             {gainPct.toFixed(1)}%
                           </span>
                         </div>
-                        <p className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>Since purchase</p>
+                        <p className="text-xs" style={{ color: 'rgba(161,174,255,0.5)' }}>Since purchase</p>
                       </div>
                     )}
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="rounded-xl p-3" style={{ background: 'hsl(var(--muted) / 0.5)' }}>
-                      <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'hsl(var(--muted-foreground))' }}>Current Value</p>
+                    <div className="rounded-xl p-3" style={{ background: 'rgba(13,16,40,0.5)' }}>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'rgba(161,174,255,0.5)' }}>Current Value</p>
                       <p className="font-bold">{fmt(p.current_valuation, p.currency)}</p>
                     </div>
                     <div className="rounded-xl p-3" style={{ background: 'rgba(16,185,129,0.08)' }}>
@@ -164,7 +164,7 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
                     </div>
                     {p.rental_income_monthly && (
                       <div className="rounded-xl p-3" style={{ background: monthlyCF >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)' }}>
-                        <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'hsl(var(--muted-foreground))' }}>Monthly CF</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'rgba(161,174,255,0.5)' }}>Monthly CF</p>
                         <p className={`font-bold ${monthlyCF >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{fmt(monthlyCF, p.currency)}</p>
                       </div>
                     )}
@@ -180,16 +180,16 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>
           <div className="w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] flex flex-col"
-            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+            style={{ background: 'rgba(13,16,40,0.8)', border: '1px solid rgba(99,102,241,0.15)' }}>
             <div className="px-6 py-5 flex items-center justify-between"
-              style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+              style={{ borderBottom: '1px solid rgba(99,102,241,0.12)' }}>
               <div>
                 <h2 className="font-bold text-lg">Add Property</h2>
-                <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>Add a real estate asset to your portfolio</p>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(161,174,255,0.5)' }}>Add a real estate asset to your portfolio</p>
               </div>
               <button onClick={() => setShowAdd(false)}
                 className="h-8 w-8 rounded-lg flex items-center justify-center"
-                style={{ color: 'hsl(var(--muted-foreground))' }}
+                style={{ color: 'rgba(161,174,255,0.5)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                 <X className="h-4 w-4" />
@@ -197,82 +197,82 @@ export function RealEstateClient({ properties, userId }: { properties: RealEstat
             </div>
             <div className="p-6 space-y-4 overflow-y-auto flex-1">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Property Name *</label>
+                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Property Name *</label>
                 <input value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Home in Bangalore / Sydney apartment"
-                  className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                  className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Address</label>
+                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Address</label>
                 <input value={form.address} onChange={(e) => update('address', e.target.value)}
-                  className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                  className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Type</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Type</label>
                   <select value={form.property_type} onChange={(e) => update('property_type', e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }}>
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }}>
                     <option value="residential">Residential</option>
                     <option value="commercial">Commercial</option>
                     <option value="land">Land</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Country</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Country</label>
                   <select value={form.country} onChange={(e) => { update('country', e.target.value); update('currency', e.target.value === 'IN' ? 'INR' : 'AUD') }}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }}>
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }}>
                     <option value="AU">🇦🇺 AU</option>
                     <option value="IN">🇮🇳 IN</option>
                     <option value="US">🇺🇸 US</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Currency</label>
-                  <input value={form.currency} readOnly className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--muted))' }} />
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Currency</label>
+                  <input value={form.currency} readOnly className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.08)' }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Current Valuation</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Current Valuation</label>
                   <input type="number" value={form.current_valuation} onChange={(e) => update('current_valuation', e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Loan Outstanding</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Loan Outstanding</label>
                   <input type="number" value={form.loan_outstanding} onChange={(e) => update('loan_outstanding', e.target.value)} placeholder="0"
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Loan Rate (%)</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Loan Rate (%)</label>
                   <input type="number" step="0.01" value={form.loan_rate} onChange={(e) => update('loan_rate', e.target.value)} placeholder="6.5"
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Purchase Price</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Purchase Price</label>
                   <input type="number" value={form.purchase_price} onChange={(e) => update('purchase_price', e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Rental Income/mo</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Rental Income/mo</label>
                   <input type="number" value={form.rental_income_monthly} onChange={(e) => update('rental_income_monthly', e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'hsl(var(--muted-foreground))' }}>Expenses/mo</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: 'rgba(161,174,255,0.5)' }}>Expenses/mo</label>
                   <input type="number" value={form.expenses_monthly} onChange={(e) => update('expenses_monthly', e.target.value)}
-                    className={inputCls} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--background))' }} />
+                    className={inputCls} style={{ border: '1px solid rgba(99,102,241,0.15)', background: 'rgba(99,102,241,0.07)' }} />
                 </div>
               </div>
               {error && <p className="text-sm text-red-500 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
             </div>
             <div className="px-6 py-4 flex justify-end gap-3"
-              style={{ borderTop: '1px solid hsl(var(--border))' }}>
+              style={{ borderTop: '1px solid rgba(99,102,241,0.12)' }}>
               <button onClick={() => setShowAdd(false)}
                 className="px-4 py-2 text-sm rounded-lg transition-colors"
-                style={{ border: '1px solid hsl(var(--border))' }}
+                style={{ border: '1px solid rgba(99,102,241,0.15)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'hsl(var(--muted))' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                 Cancel

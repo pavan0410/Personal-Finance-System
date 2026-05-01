@@ -58,7 +58,7 @@ export default async function DashboardPage() {
             value={summary.accountsAUD}
             icon={<CreditCard className="h-4 w-4 text-white" />}
             gradient="linear-gradient(135deg, #6366f1, #8b5cf6)"
-            shadowColor="rgba(99,102,241,0.35)"
+            shadowColor="rgba(99,102,241,0.4)"
           />
           <StatCard
             label="Mutual Funds 🇮🇳"
@@ -67,76 +67,105 @@ export default async function DashboardPage() {
             subValue={formatINR(totalMFValueINR)}
             icon={<TrendingUp className="h-4 w-4 text-white" />}
             gradient="linear-gradient(135deg, #10b981, #059669)"
-            shadowColor="rgba(16,185,129,0.35)"
+            shadowColor="rgba(16,185,129,0.4)"
           />
           <StatCard
             label="ETFs 🇦🇺 🇺🇸"
             value={summary.etfsAUD}
             icon={<TrendingUp className="h-4 w-4 text-white" />}
             gradient="linear-gradient(135deg, #f59e0b, #d97706)"
-            shadowColor="rgba(245,158,11,0.35)"
+            shadowColor="rgba(245,158,11,0.4)"
           />
           <StatCard
             label="Superannuation"
             value={summary.superAUD}
             icon={<Landmark className="h-4 w-4 text-white" />}
             gradient="linear-gradient(135deg, #3b82f6, #2563eb)"
-            shadowColor="rgba(59,130,246,0.35)"
+            shadowColor="rgba(59,130,246,0.4)"
           />
           <StatCard
             label="Real Estate"
             value={summary.realEstateAUD}
             icon={<Home className="h-4 w-4 text-white" />}
             gradient="linear-gradient(135deg, #8b5cf6, #7c3aed)"
-            shadowColor="rgba(139,92,246,0.35)"
+            shadowColor="rgba(139,92,246,0.4)"
           />
           <StatCard
             label="Liabilities"
             value={summary.liabilitiesAUD}
             icon={<CreditCard className="h-4 w-4 text-white" />}
             gradient="linear-gradient(135deg, #ef4444, #dc2626)"
-            shadowColor="rgba(239,68,68,0.35)"
+            shadowColor="rgba(239,68,68,0.4)"
           />
         </div>
 
         {/* Charts + Goals row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Asset allocation */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <h3 className="font-semibold mb-4">Asset Allocation</h3>
+          <div className="rounded-2xl p-6"
+            style={{
+              background: 'rgba(13,16,40,0.8)',
+              border: '1px solid rgba(99,102,241,0.15)',
+              backdropFilter: 'blur(12px)',
+            }}>
+            <h3 className="font-bold text-sm uppercase tracking-wider mb-5" style={{ color: 'rgba(161,174,255,0.7)' }}>
+              Asset Allocation
+            </h3>
             <AssetAllocationChart summary={summary} />
           </div>
 
           {/* Goals preview */}
-          <div className="rounded-xl border border-border bg-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Goals</h3>
-              <Link href="/goals" className="text-xs text-primary flex items-center gap-1 hover:underline">
+          <div className="rounded-2xl p-6"
+            style={{
+              background: 'rgba(13,16,40,0.8)',
+              border: '1px solid rgba(99,102,241,0.15)',
+              backdropFilter: 'blur(12px)',
+            }}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-bold text-sm uppercase tracking-wider" style={{ color: 'rgba(161,174,255,0.7)' }}>
+                Goals
+              </h3>
+              <Link href="/goals"
+                className="text-xs flex items-center gap-1 transition-all hover:gap-1.5"
+                style={{ color: '#818cf8' }}>
                 View all <ArrowUpRight className="h-3 w-3" />
               </Link>
             </div>
             {(!goals || goals.length === 0) ? (
               <div className="flex flex-col items-center justify-center h-48 text-center">
-                <Target className="h-8 w-8 text-muted-foreground mb-3" />
-                <p className="text-sm text-muted-foreground">No goals set yet</p>
-                <Link href="/goals" className="mt-3 text-sm text-primary hover:underline">
+                <div className="h-14 w-14 rounded-2xl flex items-center justify-center mb-4"
+                  style={{
+                    background: 'rgba(99,102,241,0.1)',
+                    border: '1px solid rgba(99,102,241,0.2)',
+                  }}>
+                  <Target className="h-6 w-6" style={{ color: 'rgba(165,180,252,0.6)' }} />
+                </div>
+                <p className="text-sm" style={{ color: 'rgba(161,174,255,0.4)' }}>No goals set yet</p>
+                <Link href="/goals"
+                  className="mt-3 text-sm font-semibold transition-colors"
+                  style={{ color: '#818cf8' }}>
                   Create your first goal →
                 </Link>
               </div>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {goals.slice(0, 4).map((goal) => {
                   const pct = Math.min(100, (goal.current_amount / goal.target_amount) * 100)
                   return (
                     <li key={goal.id}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium">{goal.name}</span>
-                        <span className="text-muted-foreground">{pct.toFixed(0)}%</span>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="font-semibold text-white/80">{goal.name}</span>
+                        <span className="font-bold text-xs" style={{ color: '#818cf8' }}>{pct.toFixed(0)}%</span>
                       </div>
-                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div className="h-1.5 rounded-full overflow-hidden"
+                        style={{ background: 'rgba(99,102,241,0.12)' }}>
                         <div
-                          className="h-full rounded-full bg-primary transition-all"
-                          style={{ width: `${pct}%` }}
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: `${pct}%`,
+                            background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+                            boxShadow: '0 0 8px rgba(99,102,241,0.5)',
+                          }}
                         />
                       </div>
                     </li>
