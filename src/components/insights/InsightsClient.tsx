@@ -13,15 +13,17 @@ const PRESET_QUESTIONS = [
   'Suggest a monthly investment plan across MFs and ETFs to grow my wealth in 10 years.',
 ]
 
-interface Props {
-  portfolioSnapshot: Record<string, unknown>
-}
-
-const CARD = {
+const CARD_STYLE = {
   background: 'rgba(13,16,40,0.8)',
   border: '1px solid rgba(99,102,241,0.15)',
   backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
+}
+
+const LABEL_COLOR = { color: 'rgba(161,174,255,0.5)' }
+const TEXT_COLOR = { color: 'rgba(220,225,255,0.9)' }
+
+interface Props {
+  portfolioSnapshot: Record<string, unknown>
 }
 
 export function InsightsClient({ portfolioSnapshot }: Props) {
@@ -75,24 +77,22 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
           background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%)',
           boxShadow: '0 20px 60px rgba(99,102,241,0.35)',
         }}>
-        <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)' }} />
-        <div className="absolute -right-2 -bottom-6 h-20 w-20 rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)' }} />
+        <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-10" style={{ background: 'white' }} />
+        <div className="absolute -right-2 -bottom-6 h-20 w-20 rounded-full opacity-10" style={{ background: 'white' }} />
         <div className="relative flex items-start gap-4">
           <div className="h-12 w-12 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
             <Sparkles className="h-6 w-6 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-black text-lg text-white">WealthLens AI</h2>
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-black"
-                style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="font-bold text-lg text-white">WealthLens AI</h2>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold"
+                style={{ background: 'rgba(255,255,255,0.2)', color: 'white', backdropFilter: 'blur(4px)' }}>
                 AI
               </span>
             </div>
-            <p className="text-sm text-white/60 mt-0.5">Powered by Claude · Indian & Australian markets specialist</p>
+            <p className="text-sm text-white/70">Powered by Claude · Indian & Australian markets specialist</p>
             <p className="text-sm text-white/80 mt-3 leading-relaxed max-w-2xl">
               Ask me anything about your portfolio — fund recommendations, goal analysis, tax optimisation for DTAA, or a complete financial health check. I analyse your real portfolio data to give specific, actionable advice.
             </p>
@@ -102,29 +102,14 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
 
       {/* Preset questions */}
       <div>
-        <p className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3"
-          style={{ color: 'rgba(161,174,255,0.5)' }}>Quick Questions</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wider mb-3" style={LABEL_COLOR}>Quick Questions</p>
         <div className="flex flex-wrap gap-2">
           {PRESET_QUESTIONS.map((q) => (
             <button key={q} onClick={() => askQuestion(q)} disabled={loading}
               className="text-xs px-3 py-2 rounded-xl text-left transition-all disabled:opacity-50"
-              style={{
-                background: 'rgba(99,102,241,0.08)',
-                border: '1px solid rgba(99,102,241,0.2)',
-                color: 'rgba(165,180,252,0.75)',
-              }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.background = 'rgba(99,102,241,0.15)'
-                el.style.borderColor = 'rgba(99,102,241,0.4)'
-                el.style.color = '#a5b4fc'
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLElement
-                el.style.background = 'rgba(99,102,241,0.08)'
-                el.style.borderColor = 'rgba(99,102,241,0.2)'
-                el.style.color = 'rgba(165,180,252,0.75)'
-              }}>
+              style={{ border: '1px solid rgba(99,102,241,0.2)', color: 'rgba(220,225,255,0.8)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(99,102,241,0.4)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ''; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(99,102,241,0.2)' }}>
               {q.length > 65 ? q.slice(0, 63) + '…' : q}
             </button>
           ))}
@@ -132,7 +117,7 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
       </div>
 
       {/* Input area */}
-      <div className="rounded-2xl p-4" style={CARD}>
+      <div className="rounded-2xl p-4" style={CARD_STYLE}>
         <div className="flex gap-3 items-end">
           <div className="flex-1">
             <textarea
@@ -142,11 +127,11 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
               placeholder="Ask about your portfolio, investment strategy, goals... (Enter to send)"
               rows={3}
               className="w-full bg-transparent text-sm resize-none focus:outline-none"
-              style={{ color: 'rgba(220,225,255,0.85)' }}
+              style={TEXT_COLOR}
             />
           </div>
           <button onClick={() => askQuestion(question)} disabled={loading || !question.trim()}
-            className="px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 btn-gradient shrink-0 disabled:opacity-50">
+            className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50 flex items-center gap-2 shrink-0">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             Ask
           </button>
@@ -155,49 +140,41 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
 
       {/* Streaming response */}
       {(loading || response) && (
-        <div className="rounded-2xl p-6" style={CARD}>
-          <div className="flex items-center gap-3 mb-5 pb-4"
-            style={{ borderBottom: '1px solid rgba(99,102,241,0.12)' }}>
-            <div className="h-8 w-8 rounded-lg flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
-              }}>
-              <Sparkles className="h-4 w-4 text-white" />
+        <div className="rounded-2xl p-6" style={CARD_STYLE}>
+          <div className="flex items-center gap-2 mb-5" style={{ borderBottom: '1px solid rgba(99,102,241,0.12)', paddingBottom: '1rem' }}>
+            <div className="h-7 w-7 rounded-lg flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+              <Sparkles className="h-3.5 w-3.5 text-white" />
             </div>
-            <span className="text-sm font-bold text-white">AI Analysis</span>
+            <span className="text-sm font-semibold" style={TEXT_COLOR}>AI Analysis</span>
             {loading && (
-              <div className="ml-auto flex items-center gap-1.5 text-xs"
-                style={{ color: 'rgba(161,174,255,0.5)' }}>
+              <div className="ml-auto flex items-center gap-1.5 text-xs" style={LABEL_COLOR}>
                 <Loader2 className="h-3 w-3 animate-spin" /> Thinking...
               </div>
             )}
           </div>
-          <div className="space-y-2 text-sm leading-relaxed" style={{ color: 'rgba(220,225,255,0.85)' }}>
+          <div className="space-y-2 text-sm leading-relaxed" style={TEXT_COLOR}>
             {response.split('\n').map((line, i) => {
               if (line.startsWith('## ')) return (
-                <h3 key={i} className="font-black text-base mt-5 mb-2 gradient-text">{line.slice(3)}</h3>
+                <h3 key={i} className="font-bold text-base mt-5 mb-2" style={{ color: '#818cf8' }}>{line.slice(3)}</h3>
               )
               if (line.startsWith('### ')) return (
-                <h4 key={i} className="font-bold text-sm mt-3 mb-1" style={{ color: '#a5b4fc' }}>{line.slice(4)}</h4>
+                <h4 key={i} className="font-semibold text-sm mt-3 mb-1" style={{ color: '#a5b4fc' }}>{line.slice(4)}</h4>
               )
               if (line.startsWith('- ') || line.startsWith('* ')) return (
                 <div key={i} className="flex items-start gap-2 ml-2">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full shrink-0"
-                    style={{ background: '#6366f1' }} />
+                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0" style={{ background: '#6366f1' }} />
                   <p>{line.slice(2)}</p>
                 </div>
               )
               if (line.startsWith('**') && line.endsWith('**')) return (
-                <p key={i} className="font-bold text-white">{line.slice(2, -2)}</p>
+                <p key={i} className="font-bold">{line.slice(2, -2)}</p>
               )
               if (line.trim() === '') return <div key={i} className="h-2" />
               return <p key={i}>{line}</p>
             })}
-            {loading && (
-              <span className="inline-block w-1 h-4 rounded animate-pulse ml-0.5"
-                style={{ background: '#6366f1' }} />
-            )}
+            {loading && <span className="inline-block w-1 h-4 rounded animate-pulse ml-0.5"
+              style={{ background: '#6366f1' }} />}
           </div>
         </div>
       )}
@@ -205,27 +182,24 @@ export function InsightsClient({ portfolioSnapshot }: Props) {
       {/* History */}
       {history.length > 1 && (
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3"
-            style={{ color: 'rgba(161,174,255,0.5)' }}>Previous Questions</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wider mb-3" style={LABEL_COLOR}>Previous Questions</p>
           <div className="space-y-3">
             {history.slice(1).map((item, i) => (
-              <div key={i} className="rounded-xl p-4 transition-colors" style={CARD}>
+              <div key={i} className="rounded-xl p-4 transition-colors" style={CARD_STYLE}>
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-3.5 w-3.5 shrink-0" style={{ color: '#818cf8' }} />
-                    <p className="text-sm font-medium text-white">{item.q}</p>
+                    <p className="text-sm font-medium" style={TEXT_COLOR}>{item.q}</p>
                   </div>
                   <button onClick={() => { setResponse(item.a); setQuestion('') }}
-                    className="shrink-0 p-1 rounded-lg transition-all"
-                    style={{ color: 'rgba(161,174,255,0.4)' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.12)'; (e.currentTarget as HTMLElement).style.color = '#a5b4fc' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ''; (e.currentTarget as HTMLElement).style.color = 'rgba(161,174,255,0.4)' }}>
+                    className="shrink-0 p-1 rounded-lg transition-colors"
+                    style={{ color: 'rgba(161,174,255,0.5)' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.1)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '' }}>
                     <RefreshCw className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <p className="text-xs line-clamp-2" style={{ color: 'rgba(161,174,255,0.4)' }}>
-                  {item.a.slice(0, 200)}…
-                </p>
+                <p className="text-xs line-clamp-2" style={LABEL_COLOR}>{item.a.slice(0, 200)}…</p>
               </div>
             ))}
           </div>
