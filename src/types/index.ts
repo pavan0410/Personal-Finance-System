@@ -110,14 +110,56 @@ export interface RealEstate {
   property_type: 'residential' | 'commercial' | 'land'
   country: string
   currency: string
+  // Purchase
   purchase_price: number | null
   purchase_date: string | null
+  year_built: number | null
+  // Loan
+  loan_amount: number | null        // original loan at settlement
+  loan_outstanding: number          // current outstanding balance
+  loan_rate: number | null          // annual interest rate as % (e.g. 6.89)
+  loan_type: string | null          // P&I | Interest Only
+  loan_term_years: number | null
+  rate_type: string | null          // Fixed | Variable
+  lender: string | null
+  // Settlement & repayments
+  settlement_date: string | null
+  deposit_paid: number | null       // cash paid at settlement → equity
+  emi_start_date: string | null     // repayment commencement date
+  payment_freq: string | null       // Monthly | Fortnightly | Weekly
+  // Valuation
   current_valuation: number | null
   valuation_date: string | null
-  loan_outstanding: number
-  loan_rate: number | null
+  growth_rate: number | null        // expected annual capital growth (e.g. 0.04 = 4%)
+  // Rental
+  tenancy_start: string | null
+  weekly_rent: number | null
+  vacancy_weeks: number | null      // assumed vacancy per year (weeks)
+  property_mgmt_pct: number | null  // e.g. 0.066 = 6.6%
+  // Legacy monthly fields
   rental_income_monthly: number | null
   expenses_monthly: number | null
+  // Annual operating costs (used for FY cash flow auto-estimation)
+  council_rates: number | null
+  water_rates: number | null
+  landlord_insurance: number | null
+  repairs_maintenance: number | null
+  accounting: number | null
+  quantity_surveyor: number | null
+  sundry: number | null
+  div43_annual: number | null       // Div 43 building depreciation (annual)
+  div40_annual: number | null       // Div 40 plant & equipment (annual)
+  // Ownership & tax (for negative gearing calculation)
+  owner1_name: string | null
+  owner1_salary: number | null
+  owner1_share: number | null       // e.g. 0.5 = 50%
+  owner1_tax_rate: number | null    // marginal rate as decimal e.g. 0.37
+  owner2_name: string | null
+  owner2_salary: number | null
+  owner2_share: number | null
+  owner2_tax_rate: number | null
+  medicare_levy: number | null      // e.g. 0.02
+  property_status: string | null    // Pre-settlement | Pre-tenancy | Tenanted | Vacant
   created_at: string
   updated_at: string
 }
