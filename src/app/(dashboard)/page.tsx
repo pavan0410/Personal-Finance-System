@@ -53,50 +53,37 @@ export default async function DashboardPage() {
 
         {/* Stat cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          <StatCard
-            label="Savings & Accounts"
-            value={summary.accountsAUD}
-            icon={<CreditCard className="h-4 w-4 text-white" />}
-            gradient="linear-gradient(135deg, #6366f1, #8b5cf6)"
-            shadowColor="rgba(99,102,241,0.4)"
-          />
-          <StatCard
-            label="Mutual Funds 🇮🇳"
-            value={summary.mutualFundsAUD}
-            subLabel="INR"
-            subValue={formatINR(totalMFValueINR)}
-            icon={<TrendingUp className="h-4 w-4 text-white" />}
-            gradient="linear-gradient(135deg, #10b981, #059669)"
-            shadowColor="rgba(16,185,129,0.4)"
-          />
-          <StatCard
-            label="ETFs 🇦🇺 🇺🇸"
-            value={summary.etfsAUD}
-            icon={<TrendingUp className="h-4 w-4 text-white" />}
-            gradient="linear-gradient(135deg, #f59e0b, #d97706)"
-            shadowColor="rgba(245,158,11,0.4)"
-          />
-          <StatCard
-            label="Superannuation"
-            value={summary.superAUD}
-            icon={<Landmark className="h-4 w-4 text-white" />}
-            gradient="linear-gradient(135deg, #3b82f6, #2563eb)"
-            shadowColor="rgba(59,130,246,0.4)"
-          />
-          <StatCard
-            label="Real Estate"
-            value={summary.realEstateAUD}
-            icon={<Home className="h-4 w-4 text-white" />}
-            gradient="linear-gradient(135deg, #8b5cf6, #7c3aed)"
-            shadowColor="rgba(139,92,246,0.4)"
-          />
-          <StatCard
-            label="Liabilities"
-            value={summary.liabilitiesAUD}
-            icon={<CreditCard className="h-4 w-4 text-white" />}
-            gradient="linear-gradient(135deg, #ef4444, #dc2626)"
-            shadowColor="rgba(239,68,68,0.4)"
-          />
+          <Link href="/accounts">
+            <StatCard label="Savings & Accounts" value={summary.accountsAUD}
+              icon={<CreditCard className="h-4 w-4 text-white" />}
+              gradient="linear-gradient(135deg, #6366f1, #8b5cf6)" shadowColor="rgba(99,102,241,0.4)" />
+          </Link>
+          <Link href="/investments/mutual-funds">
+            <StatCard label="Mutual Funds 🇮🇳" value={summary.mutualFundsAUD}
+              subLabel="INR" subValue={formatINR(totalMFValueINR)}
+              icon={<TrendingUp className="h-4 w-4 text-white" />}
+              gradient="linear-gradient(135deg, #10b981, #059669)" shadowColor="rgba(16,185,129,0.4)" />
+          </Link>
+          <Link href="/investments/etfs">
+            <StatCard label="ETFs 🇦🇺 🇺🇸" value={summary.etfsAUD}
+              icon={<TrendingUp className="h-4 w-4 text-white" />}
+              gradient="linear-gradient(135deg, #f59e0b, #d97706)" shadowColor="rgba(245,158,11,0.4)" />
+          </Link>
+          <Link href="/superannuation">
+            <StatCard label="Superannuation" value={summary.superAUD}
+              icon={<Landmark className="h-4 w-4 text-white" />}
+              gradient="linear-gradient(135deg, #3b82f6, #2563eb)" shadowColor="rgba(59,130,246,0.4)" />
+          </Link>
+          <Link href="/real-estate">
+            <StatCard label="Real Estate" value={summary.realEstateAUD}
+              icon={<Home className="h-4 w-4 text-white" />}
+              gradient="linear-gradient(135deg, #8b5cf6, #7c3aed)" shadowColor="rgba(139,92,246,0.4)" />
+          </Link>
+          <Link href="/accounts">
+            <StatCard label="Liabilities" value={summary.liabilitiesAUD}
+              icon={<CreditCard className="h-4 w-4 text-white" />}
+              gradient="linear-gradient(135deg, #ef4444, #dc2626)" shadowColor="rgba(239,68,68,0.4)" />
+          </Link>
         </div>
 
         {/* Charts + Goals row */}

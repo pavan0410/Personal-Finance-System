@@ -42,9 +42,15 @@ export function buildPortfolioSummary(
       return new Decimal(sum).plus(a.balance).toNumber()
     }, 0)
 
-  const liabilitiesAUD = accounts
+  const creditLiabilities = accounts
     .filter((a) => a.type === 'credit')
     .reduce((sum, a) => new Decimal(sum).plus(Math.abs(a.balance)).toNumber(), 0)
+
+  const propertyLoans = properties.reduce((sum, p) => {
+    return new Decimal(sum).plus(p.loan_outstanding ?? 0).toNumber()
+  }, 0)
+
+  const liabilitiesAUD = new Decimal(creditLiabilities).plus(propertyLoans).toNumber()
 
   const mutualFundsAUD = mfHoldings.reduce((sum, h) => {
     const valueINR = calcMFCurrentValueINR(h)
@@ -61,7 +67,7 @@ export function buildPortfolioSummary(
   }, 0)
 
   const realEstateAUD = properties.reduce((sum, p) => {
-    return new Decimal(sum).plus(p.current_valuation ?? 0).toNumber()
+    return new Decimal(sum).plus(p.current_valuation ?? p.purchase_price ?? 0).toNumber()
   }, 0)
 
   const totalAUD = new Decimal(accountsAUD)
