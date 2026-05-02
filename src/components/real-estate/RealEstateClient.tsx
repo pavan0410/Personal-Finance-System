@@ -574,10 +574,10 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
   const [propF, setPropF] = useState<PropForm>({ ...PROP_DEFAULTS })
   const [editF, setEditF] = useState<PropForm>({ ...PROP_DEFAULTS })
 
-  const EXP_INIT = { property_id: properties[0]?.id ?? '', date: new Date().toISOString().split('T')[0], amount: '', category: ATO_CATS[0].cat, description: '', deductibility: ATO_CATS[0].deduct, file: null as File | null }
-  const INC_INIT = { property_id: properties[0]?.id ?? '', date: new Date().toISOString().split('T')[0], amount: '', description: 'Rental income' }
-  const [expF, setExpF] = useState(EXP_INIT)
-  const [incF, setIncF] = useState(INC_INIT)
+  const makeExpInit = () => ({ property_id: properties[0]?.id ?? '', date: new Date().toISOString().split('T')[0], amount: '', category: ATO_CATS[0].cat, description: '', deductibility: ATO_CATS[0].deduct, file: null as File | null })
+  const makeIncInit = () => ({ property_id: properties[0]?.id ?? '', date: new Date().toISOString().split('T')[0], amount: '', description: 'Rental income' })
+  const [expF, setExpF] = useState(makeExpInit)
+  const [incF, setIncF] = useState(makeIncInit)
 
   // Derived
   const allFYs = Array.from(new Set([
@@ -747,7 +747,7 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
     setSaving(false)
     if (error) { setError(error.message); return }
     if (data) setExpenses(prev => [data as RealEstateExpense, ...prev])
-    setShowExp(false); setExpF(EXP_INIT)
+    setShowExp(false); setExpF(makeExpInit())
   }
 
   async function saveIncome() {
@@ -760,7 +760,7 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
     setSaving(false)
     if (error) { setError(error.message); return }
     if (data) setIncome(prev => [data as RealEstateIncome, ...prev])
-    setShowInc(false); setIncF(INC_INIT)
+    setShowInc(false); setIncF(makeIncInit())
   }
 
   async function deleteExpense(id: string) {
@@ -966,7 +966,7 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
           <div className="flex items-center justify-between flex-wrap gap-3">
             <FilterBar selectedFY={selectedFY} setSelectedFY={setSelectedFY} allFYs={allFYs}
               filterPropId={filterPropId} setFilterPropId={setFilterPropId} properties={properties} />
-            <button onClick={() => { setError(''); setShowInc(true) }}
+            <button onClick={() => { setError(''); setIncF(makeIncInit()); setShowInc(true) }}
               className="btn-gradient flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white"
               disabled={properties.length === 0}>
               <Plus className="h-3 w-3" />Add Income
@@ -1024,7 +1024,7 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
           <div className="flex items-center justify-between flex-wrap gap-3">
             <FilterBar selectedFY={selectedFY} setSelectedFY={setSelectedFY} allFYs={allFYs}
               filterPropId={filterPropId} setFilterPropId={setFilterPropId} properties={properties} />
-            <button onClick={() => { setError(''); setShowExp(true) }}
+            <button onClick={() => { setError(''); setExpF(makeExpInit()); setShowExp(true) }}
               className="btn-gradient flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white"
               disabled={properties.length === 0}>
               <Plus className="h-3 w-3" />Log Expense
