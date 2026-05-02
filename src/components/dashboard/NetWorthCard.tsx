@@ -1,3 +1,5 @@
+'use client'
+
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { formatAUD, formatPercent } from '@/lib/utils'
 import type { PortfolioSummary } from '@/types'
