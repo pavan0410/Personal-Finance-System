@@ -138,6 +138,29 @@ export interface Goal {
   updated_at: string
 }
 
+export interface RealEstateExpense {
+  id: string
+  user_id: string
+  property_id: string
+  date: string
+  amount: number
+  category: string
+  description: string | null
+  is_deductible: boolean
+  receipt_url: string | null
+  created_at: string
+}
+
+export interface RealEstateIncome {
+  id: string
+  user_id: string
+  property_id: string
+  date: string
+  amount: number
+  description: string | null
+  created_at: string
+}
+
 export interface ExchangeRate {
   from_currency: string
   to_currency: string
