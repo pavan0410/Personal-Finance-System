@@ -564,12 +564,13 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
   const [expenses, setExpenses] = useState(initExp)
   const [income,   setIncome]   = useState(initInc)
 
-  const [showProp,    setShowProp]    = useState(false)
-  const [showExp,     setShowExp]     = useState(false)
-  const [showInc,     setShowInc]     = useState(false)
+  const [showProp,     setShowProp]     = useState(false)
+  const [showExp,      setShowExp]      = useState(false)
+  const [showInc,      setShowInc]      = useState(false)
   const [showFullEdit, setShowFullEdit] = useState(false)
-  const [saving,      setSaving]      = useState(false)
-  const [error,       setError]       = useState('')
+  const [editingExpId, setEditingExpId] = useState<string | null>(null)
+  const [saving,       setSaving]       = useState(false)
+  const [error,        setError]        = useState('')
 
   const [propF, setPropF] = useState<PropForm>({ ...PROP_DEFAULTS })
   const [editF, setEditF] = useState<PropForm>({ ...PROP_DEFAULTS })
@@ -724,6 +725,22 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
     setEditPropId(null); setShowFullEdit(false); router.refresh()
   }
 
+  function openEditExpense(e: RealEstateExpense) {
+    const atoCat = ATO_CATS.find(c => c.cat === e.category)
+    setExpF({
+      property_id: e.property_id,
+      date: e.date,
+      amount: String(e.amount),
+      category: e.category,
+      description: e.description ?? '',
+      deductibility: atoCat?.deduct ?? 'Fully deductible',
+      file: null,
+    })
+    setEditingExpId(e.id)
+    setError('')
+    setShowExp(true)
+  }
+
   async function saveExpense() {
     if (!expF.amount || !expF.property_id) return
     setSaving(true); setError('')
@@ -739,15 +756,29 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
       }
     }
     const isDeductible = expF.deductibility === 'Fully deductible' || expF.deductibility === 'Depreciation (non-cash)'
-    const { data, error } = await supabase.from('real_estate_expenses').insert({
-      user_id: userId, property_id: expF.property_id, date: expF.date,
+    const payload = {
+      property_id: expF.property_id, date: expF.date,
       amount: parseFloat(expF.amount), category: expF.category,
-      description: expF.description || null, is_deductible: isDeductible, receipt_url: receiptUrl,
-    }).select().single()
-    setSaving(false)
-    if (error) { setError(error.message); return }
-    if (data) setExpenses(prev => [data as RealEstateExpense, ...prev])
-    setShowExp(false); setExpF(makeExpInit())
+      description: expF.description || null, is_deductible: isDeductible,
+      ...(receiptUrl ? { receipt_url: receiptUrl } : {}),
+    }
+
+    if (editingExpId) {
+      // UPDATE existing expense
+      const { data, error } = await supabase.from('real_estate_expenses')
+        .update(payload).eq('id', editingExpId).select().single()
+      setSaving(false)
+      if (error) { setError(error.message); return }
+      if (data) setExpenses(prev => prev.map(e => e.id === editingExpId ? data as RealEstateExpense : e))
+    } else {
+      // INSERT new expense
+      const { data, error } = await supabase.from('real_estate_expenses')
+        .insert({ user_id: userId, ...payload }).select().single()
+      setSaving(false)
+      if (error) { setError(error.message); return }
+      if (data) setExpenses(prev => [data as RealEstateExpense, ...prev])
+    }
+    setShowExp(false); setEditingExpId(null); setExpF(makeExpInit())
   }
 
   async function saveIncome() {
@@ -1075,9 +1106,14 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
                         <td className="px-4 py-3 text-[11px]" style={{ color: isDeductible ? '#6ee7b7' : '#fcd34d' }}>{atoCat?.deduct ?? '—'}</td>
                         <td className="px-4 py-3 text-right font-bold text-red-400 tabular-nums text-xs">{formatAUD(e.amount)}</td>
                         <td className="px-3 py-3">
-                          <button onClick={() => deleteExpense(e.id)} className="opacity-0 group-hover:opacity-100 p-1 rounded" style={{ color: 'rgba(239,68,68,0.6)' }}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                            <button onClick={() => openEditExpense(e)} className="p-1 rounded" style={{ color: 'rgba(99,102,241,0.7)' }} title="Edit">
+                              <Edit2 className="h-3.5 w-3.5" />
+                            </button>
+                            <button onClick={() => deleteExpense(e.id)} className="p-1 rounded" style={{ color: 'rgba(239,68,68,0.6)' }} title="Delete">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     )
@@ -1229,8 +1265,11 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
           <div className="w-full max-w-md rounded-2xl max-h-[90vh] flex flex-col" style={MODAL}>
             <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(99,102,241,0.2)' }}>
-              <div><h2 className="font-bold text-lg" style={TC}>Log Expense</h2><p className="text-xs mt-0.5" style={LC}>ATO categorised property expense</p></div>
-              <button onClick={() => setShowExp(false)} className="h-8 w-8 rounded-lg flex items-center justify-center" style={LC}><X className="h-4 w-4" /></button>
+              <div>
+                <h2 className="font-bold text-lg" style={TC}>{editingExpId ? 'Edit Expense' : 'Log Expense'}</h2>
+                <p className="text-xs mt-0.5" style={LC}>ATO categorised property expense</p>
+              </div>
+              <button onClick={() => { setShowExp(false); setEditingExpId(null) }} className="h-8 w-8 rounded-lg flex items-center justify-center" style={LC}><X className="h-4 w-4" /></button>
             </div>
             <div className="p-6 space-y-4 overflow-y-auto flex-1">
               <div className="grid grid-cols-2 gap-3">
@@ -1280,10 +1319,10 @@ export function RealEstateClient({ properties, expenses: initExp, income: initIn
               {error && <div className="text-xs px-3 py-2 rounded-lg" style={{ background: 'rgba(239,68,68,0.1)', color: '#fca5a5' }}>{error}</div>}
             </div>
             <div className="px-6 py-4 flex justify-end gap-3" style={{ borderTop: '1px solid rgba(99,102,241,0.2)' }}>
-              <button onClick={() => setShowExp(false)} className="btn-ghost px-4 py-2 text-sm rounded-lg">Cancel</button>
+              <button onClick={() => { setShowExp(false); setEditingExpId(null) }} className="btn-ghost px-4 py-2 text-sm rounded-lg">Cancel</button>
               <button onClick={saveExpense} disabled={saving || !expF.amount || !expF.property_id}
                 className="btn-gradient px-5 py-2 text-sm rounded-lg text-white font-medium disabled:opacity-50 flex items-center gap-2">
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />}Log Expense
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />}{editingExpId ? 'Save Changes' : 'Log Expense'}
               </button>
             </div>
           </div>
