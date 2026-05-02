@@ -42,15 +42,10 @@ export function buildPortfolioSummary(
       return new Decimal(sum).plus(a.balance).toNumber()
     }, 0)
 
-  const creditLiabilities = accounts
+  // Only credit card balances in liabilities — property loans are netted inside realEstateAUD (equity view)
+  const liabilitiesAUD = accounts
     .filter((a) => a.type === 'credit')
     .reduce((sum, a) => new Decimal(sum).plus(Math.abs(a.balance)).toNumber(), 0)
-
-  const propertyLoans = properties.reduce((sum, p) => {
-    return new Decimal(sum).plus(p.loan_outstanding ?? 0).toNumber()
-  }, 0)
-
-  const liabilitiesAUD = new Decimal(creditLiabilities).plus(propertyLoans).toNumber()
 
   const mutualFundsAUD = mfHoldings.reduce((sum, h) => {
     const valueINR = calcMFCurrentValueINR(h)
@@ -66,8 +61,12 @@ export function buildPortfolioSummary(
     return new Decimal(sum).plus(s.balance ?? 0).toNumber()
   }, 0)
 
+  // Equity only: value minus outstanding loan (deposit + principal repaid).
+  // Uses current_valuation when set, otherwise falls back to purchase_price.
   const realEstateAUD = properties.reduce((sum, p) => {
-    return new Decimal(sum).plus(p.current_valuation ?? p.purchase_price ?? 0).toNumber()
+    const value = p.current_valuation ?? p.purchase_price ?? 0
+    const equity = Math.max(0, value - (p.loan_outstanding ?? 0))
+    return new Decimal(sum).plus(equity).toNumber()
   }, 0)
 
   const totalAUD = new Decimal(accountsAUD)

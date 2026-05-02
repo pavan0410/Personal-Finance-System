@@ -75,7 +75,8 @@ export default async function DashboardPage() {
               gradient="linear-gradient(135deg, #3b82f6, #2563eb)" shadowColor="rgba(59,130,246,0.4)" />
           </Link>
           <Link href="/real-estate">
-            <StatCard label="Real Estate" value={summary.realEstateAUD}
+            <StatCard label="Real Estate (Equity)" value={summary.realEstateAUD}
+              subLabel="value − loan" subValue={(properties ?? []).length > 0 ? 'deposit + principal' : ''}
               icon={<Home className="h-4 w-4 text-white" />}
               gradient="linear-gradient(135deg, #8b5cf6, #7c3aed)" shadowColor="rgba(139,92,246,0.4)" />
           </Link>
