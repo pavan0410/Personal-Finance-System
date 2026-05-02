@@ -219,7 +219,7 @@ interface Props {
 
 // ── Default form values ───────────────────────────────────────────────────────
 const PROP_DEFAULTS = {
-  name: '', address: '', property_type: 'residential' as const,
+  name: '', address: '', property_type: 'residential' as 'residential' | 'commercial' | 'land',
   country: 'AU', currency: 'AUD', year_built: '',
   purchase_price: '', purchase_date: '', settlement_date: '', deposit_paid: '',
   loan_amount: '', loan_outstanding: '', loan_rate: '6.89', loan_type: 'P&I',
