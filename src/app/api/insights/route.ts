@@ -1,8 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
 
-const client = new Anthropic()
-
 const SYSTEM_PROMPT = `You are WealthLens AI — an expert personal finance advisor specializing in cross-border wealth management for Indian-Australian residents.
 
 Your expertise covers:
@@ -25,6 +23,7 @@ Communication style:
 
 export async function POST(req: Request) {
   try {
+    const client = new Anthropic()
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return new Response('Unauthorized', { status: 401 })
@@ -32,24 +31,13 @@ export async function POST(req: Request) {
     const { question, portfolioSnapshot } = await req.json()
 
     const stream = await client.messages.stream({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 2048,
       system: SYSTEM_PROMPT,
       messages: [
         {
           role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `Here is my current portfolio snapshot:\n\n${JSON.stringify(portfolioSnapshot, null, 2)}`,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              cache_control: { type: 'ephemeral' } as any,
-            },
-            {
-              type: 'text',
-              text: question,
-            },
-          ],
+          content: `Here is my current portfolio snapshot:\n\n${JSON.stringify(portfolioSnapshot, null, 2)}\n\n${question}`,
         },
       ],
     })
