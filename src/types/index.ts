@@ -203,6 +203,27 @@ export interface RealEstateIncome {
   created_at: string
 }
 
+export interface BudgetCategory {
+  id: string
+  user_id: string
+  name: string
+  emoji: string
+  color: string
+  monthly_budget: number
+  is_income: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface SavingsBalance {
+  id: string
+  user_id: string
+  balance: number
+  as_of_date: string
+  created_at: string
+  updated_at: string
+}
+
 export interface ExchangeRate {
   from_currency: string
   to_currency: string
